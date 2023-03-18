@@ -1,0 +1,6 @@
+{"metric":"RAMP_UP_SCORE", "api":"NA", "filepath":"src/rate_repos/metrics/ramp_up.py", "line":0}
+{"metric":"CORRECTNESS_SCORE", "api":"graphql", "filepath":"src/rate_repos/metrics/correctness.py", "line":34}
+{"metric":"RESPONSIVE_MAINTAINER_SCORE", "api":"rest", "filepath":"src/rate_repos/metrics/responsive_maintainer.py", "line":34}
+{"metric":"RESPONSIVE_MAINTAINER_SCORE", "api":"rest", "filepath":"src/rate_repos/metrics/responsive_maintainer.py", "line":81}
+{"metric":"LICENSE_SCORE", "api":"rest", "filepath":"src/rate_repos/metrics/license.py", "line":16}
+{"metric":"BUS_FACTOR_SCORE", "api":"rest", "filepath":"src/rate_repos/metrics/bus_factor.py", "line":10}
