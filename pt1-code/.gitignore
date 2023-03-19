@@ -1,0 +1,5 @@
+.DS_Store
+target
+.env
+*.log
+testing_logs.txt
