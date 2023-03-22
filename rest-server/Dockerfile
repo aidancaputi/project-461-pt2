@@ -11,8 +11,10 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY rest-server ./
 
+#ADD rest-server /path/inside/your/container
+
 # Install production dependencies.
-RUN pip install --no-cache-dir -r rest-server/requirements.txt
+RUN pip install --no-cache-dir -r /rest-server/requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
