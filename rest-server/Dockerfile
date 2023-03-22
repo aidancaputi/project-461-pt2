@@ -7,9 +7,9 @@ FROM python:3.10-slim
 ENV PYTHONUNBUFFERED True
 
 # Copy local code to the container image.
-ENV APP_HOME /rest-server
+ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY /rest-server ./
+COPY . ./
 
 #ADD rest-server /path/inside/your/container
 
