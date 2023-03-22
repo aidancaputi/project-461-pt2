@@ -1,7 +1,7 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/ece461-project-pt2/rest-server/Dockerfile', '.']
+  args: ['build', '-t', 'gcr.io/ece461-project-pt2/rest-server', '-f', 'rest-server', '.']
 # Push the container image to Container Registry
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/ece461-project-pt2/server']
