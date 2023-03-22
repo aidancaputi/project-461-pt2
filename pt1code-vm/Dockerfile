@@ -1,7 +1,7 @@
 FROM rust:1.67
 
 WORKDIR /usr/src/myapp
-COPY pt1code-vm .
+COPY . .
 
 RUN cargo install --path .
 RUN cargo build
