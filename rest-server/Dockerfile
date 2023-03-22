@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED True
 # Copy local code to the container image.
 ENV APP_HOME /rest-server
 WORKDIR $APP_HOME
-COPY . ./
+COPY rest-server ./
 
 #ADD rest-server /path/inside/your/container
 
