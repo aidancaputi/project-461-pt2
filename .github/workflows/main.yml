@@ -1,0 +1,12 @@
+on: push
+name: Run Build and Test
+jobs:
+  vue--frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+              cd vue-frontend/
+              npm ci
+              npm run build
+              npm run lint
