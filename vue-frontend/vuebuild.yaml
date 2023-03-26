@@ -1,5 +1,5 @@
+on: push
 name: Run Vue Build and Lint
-"on": push
 jobs:
   unit_test-lint:
     runs-on: ubuntu-latest
