@@ -6,6 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+              cd vue-frontend/
               npm ci
               npm run build
               npm run lint
