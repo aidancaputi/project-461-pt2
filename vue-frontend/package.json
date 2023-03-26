@@ -8,7 +8,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "lint": "eslint.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "vue": "^3.2.47"
