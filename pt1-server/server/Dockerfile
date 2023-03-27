@@ -3,11 +3,13 @@
 FROM rust:1.63.0
 
 # Copy local code to the container image.
-WORKDIR /server
-COPY server/ .
+WORKDIR /usr/src/app
+COPY . .
 
+RUN pwd
+RUN ls
 # Install production dependencies and build a release artifact.
-RUN cargo install --path .
+RUN cargo install --path pt1-server/server
 
 # Run the web service on container startup.
 CMD ["hellorust"]
