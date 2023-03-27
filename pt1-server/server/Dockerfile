@@ -9,7 +9,7 @@ WORKDIR $APP_HOME
 COPY pt1-server/ ./
 
 # Install production dependencies and build a release artifact.
-RUN cargo install --path .
+RUN cargo install --path pt1-server/server
 
 # Run the web service on container startup.
 CMD ["hellorust"]
