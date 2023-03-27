@@ -6,9 +6,9 @@ FROM rust:1.63.0
 WORKDIR /usr/src/app
 COPY . .
 
-CMD ["pwd"]
+RUN pwd
 # Install production dependencies and build a release artifact.
 RUN cargo install --path .
 
 # Run the web service on container startup.
-#CMD ["hellorust"]
+CMD ["hellorust"]
