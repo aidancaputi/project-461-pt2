@@ -8,7 +8,7 @@ COPY . .
 
 RUN pwd
 # Install production dependencies and build a release artifact.
-RUN cargo install --path .
+RUN cargo install --path server/
 
 # Run the web service on container startup.
 CMD ["hellorust"]
