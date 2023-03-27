@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN pwd
+RUN ls
 # Install production dependencies and build a release artifact.
 RUN cargo install --path server/
 
