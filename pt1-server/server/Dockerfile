@@ -2,14 +2,12 @@
 # https://hub.docker.com/_/rust
 FROM rust:1.63.0
 
-ENV APP_HOME /pt1-server/server
-WORKDIR $APP_HOME
-
-#copy rest server folder to this image
-COPY pt1-server/ ./
+# Copy local code to the container image.
+WORKDIR /usr/src/app
+COPY . .
 
 # Install production dependencies and build a release artifact.
-RUN cargo install --path .
+RUN cargo install --path server/Cargo.toml
 
 # Run the web service on container startup.
 CMD ["hellorust"]
