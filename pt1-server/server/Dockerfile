@@ -2,9 +2,11 @@
 # https://hub.docker.com/_/rust
 FROM rust:1.63.0
 
-# Copy local code to the container image.
-WORKDIR /server
-COPY server/ .
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+
+#copy rest server folder to this image
+COPY pt1-server/ ./
 
 # Install production dependencies and build a release artifact.
 RUN cargo install --path .
