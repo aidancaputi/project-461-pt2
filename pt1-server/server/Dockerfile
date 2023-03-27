@@ -3,8 +3,8 @@
 FROM rust:1.63.0
 
 # Copy local code to the container image.
-WORKDIR /usr/src/app/server
-COPY . .
+WORKDIR /server
+COPY server/ .
 
 # Install production dependencies and build a release artifact.
 RUN cargo install --path .
