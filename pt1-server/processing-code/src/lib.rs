@@ -94,19 +94,30 @@ pub mod rate_repos {
         }
     }
 
-    pub fn rate_repos(url: &str, stdout: &mut dyn io::Write) {
-        //use std::fs;
+    // fn validate_github_url(url: &str) -> Result<bool, ureq::Error> {
+    //     let repo_full_name = &url[19..];
+    //     let token = std::env::var("GITHUB_TOKEN").unwrap();
+    //     let http_url = format!("https://api.github.com/repos/{}", &repo_full_name);
+    //     let response = ureq::get(&http_url)
+    //                     .set("Authorization", &token[..])
+    //                     .call();
+    //     match response {
+    //         Ok(_r) => return Ok(true),
+    //         Err(_e) => return Ok(false),
+    //     };
+    // }
+
+    pub fn rate_repos(url_file_path: &str, stdout: &mut dyn io::Write) {
+        use std::fs;
         simple_log::info!("Parsing url file.");
-        
-        //open file and get urls from it
-        //let file_contents = fs::read_to_string(url_file_path).expect("Unable to read file");
-        //let urls = file_contents.lines();
+        let file_contents = fs::read_to_string(url_file_path).expect("Unable to read file");
+        let urls = file_contents.lines();
 
         let mut url_specs: Vec<UrlSpecs> = Vec::new();
 
         simple_log::info!("Obtaining github urls.");
         simple_log::info!("Calling metric score calculation functions.");
-        //for url in urls {
+        for url in urls {
             if &url[0..22] == "https://www.npmjs.com/" {
                 let github_url = get_github_url_for_npm(&url).unwrap();
                 if &github_url[0..19] == "https://github.com/" {
@@ -116,6 +127,21 @@ pub mod rate_repos {
                             metric_scores: metrics::get_metrics(&github_url),
                         };
                         url_specs.push(url_spec);
+                    // }
+                    // else {
+                    //     let url_spec = UrlSpecs {
+                    //         url: url.to_string(),
+                    //         metric_scores: metrics::MetricScores {
+                    //             net_score: 0.0,
+                    //             ramp_up_score: -1,
+                    //             correctness_score: 0.0,
+                    //             bus_factor_score: 0.0,
+                    //             responsive_maintainer_score: 0.0,
+                    //             license_score: 0.0,
+                    //         },
+                    //     };
+                    //     url_specs.push(url_spec);
+                    // }
                 }
             }
             else if &url[0..19] == "https://github.com/" {
@@ -125,6 +151,21 @@ pub mod rate_repos {
                         metric_scores: metrics::get_metrics(&url),
                     };
                     url_specs.push(url_spec);
+                // }
+                // else {
+                //     let url_spec = UrlSpecs {
+                //         url: url.to_string(),
+                //         metric_scores: metrics::MetricScores {
+                //             net_score: 0.0,
+                //             ramp_up_score: -1,
+                //             correctness_score: 0.0,
+                //             bus_factor_score: 0.0,
+                //             responsive_maintainer_score: 0.0,
+                //             license_score: 0.0,
+                //         },
+                //     };
+                //     url_specs.push(url_spec);
+                // }
             }
             else {
                 let url_spec = UrlSpecs {
@@ -140,7 +181,7 @@ pub mod rate_repos {
                 };
                 url_specs.push(url_spec);
             }
-        //}
+        }
 
         // sort the repos in decreasing order
         simple_log::info!("Sorting repos in decreasing order.");
