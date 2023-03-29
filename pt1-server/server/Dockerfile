@@ -2,7 +2,7 @@
 # https://hub.docker.com/_/rust
 FROM rust:1.63.0
 
-# Copy local code to the container image.
+# Copy local code to the container image. for push
 WORKDIR /usr/src/app
 COPY . .
 
