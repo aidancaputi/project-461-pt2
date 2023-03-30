@@ -94,7 +94,7 @@ pub mod rate_repos {
         }
     }
 
-    pub fn rate_repos(url: &str, stdout: &mut dyn io::Write) {
+    pub fn rate_repos(url: &str, stdout: &mut dyn io::Write){
         //use std::fs;
         simple_log::info!("Parsing url file.");
         
@@ -151,8 +151,11 @@ pub mod rate_repos {
                 .unwrap()
         });
 
+
         simple_log::info!("Printing final score calculations.");
         print_url_specs(&url_specs, stdout);
+        //return url_specs;
+
     }
 
     pub fn print_url_specs(url_specs: &Vec<UrlSpecs>, stdout: &mut dyn io::Write) {

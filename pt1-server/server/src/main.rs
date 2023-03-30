@@ -5,6 +5,8 @@ use hyper::{
    };
    use std::convert::Infallible;
    use std::env;
+   use purdue461_cli;
+   use std::io;
    
    #[tokio::main]
    async fn main() {
@@ -27,6 +29,7 @@ use hyper::{
       let make_svc = make_service_fn(|_socket: &AddrStream| async move {
          Ok::<_, Infallible>(service_fn(move |_: Request<Body>| async move {
                let mut hello = "Hello ".to_string();
+               let mut _hello2 = purdue461_cli::rate_repos::rate_repos("https://www.npmjs.com/package/express", &mut io::stdout());
                match env::var("TARGET") {
                   Ok(target) => {
                      hello.push_str(&target);
