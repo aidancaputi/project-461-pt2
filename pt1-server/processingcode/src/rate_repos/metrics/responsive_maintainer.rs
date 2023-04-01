@@ -23,7 +23,7 @@ pub async fn responsive_maintainer_score(url: &str) -> f32 {
     simple_log::trace!("Calculating time since last repository update.");
     let time_since_update = calc_update_time(&octocrab, keywords);
     simple_log::trace!("Calculating final RM Score.");
-    let score = calc_rm_score(avg_time_opened, time_since_update.await);
+    let score = calc_rm_score(avg_time_opened.await, time_since_update.await);
     score
 }
 
@@ -69,7 +69,7 @@ fn get_keywords(_url: &str) -> (&str, &str) {
 }
 
 // Calculate the average time that all closed issues were open for
-#[tokio::main]
+//#[tokio::main]
 async fn calc_time_opened(octocrab: &Octocrab, (owner, repo): (&str, &str)) -> f32 {
     // Sample- use one repository and calculate mean issue open time
     let mut count = 0.0;
