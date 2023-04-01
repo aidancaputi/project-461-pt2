@@ -2,7 +2,7 @@
 // and the last time the repository was updated
 use octocrab::Octocrab;
 use std::sync::Arc;
-pub fn responsive_maintainer_score(url: &str) -> f32 {
+pub async fn responsive_maintainer_score(url: &str) -> f32 {
     simple_log::info!("Calculating Responsive Maintainer Score.)");
 
     let token = std::env::var("GITHUB_TOKEN");
@@ -23,13 +23,13 @@ pub fn responsive_maintainer_score(url: &str) -> f32 {
     simple_log::trace!("Calculating time since last repository update.");
     let time_since_update = calc_update_time(&octocrab, keywords);
     simple_log::trace!("Calculating final RM Score.");
-    let score = calc_rm_score(avg_time_opened, time_since_update);
+    let score = calc_rm_score(avg_time_opened, time_since_update.await);
     score
 }
 
 // Calculate the amount of time since the repsository was updated
 use ::std::time::SystemTime;
-#[tokio::main]
+//#[tokio::main]
 async fn calc_update_time(octocrab: &Octocrab, (owner, repo): (&str, &str)) -> f32 {
     let value = octocrab
         .repos(owner, repo)

@@ -1,8 +1,10 @@
 use std::env;
-use std::io;
+//use std::io;
 use purdue461_cli::rate_repos;
+use purdue461_cli::rate_repos::UrlSpecs;
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     let log_file = env::var("LOG_FILE").unwrap();
     let level = env::var("LOG_LEVEL");
     let log_level = match &level {
@@ -27,10 +29,12 @@ fn main() -> Result<(), String> {
     let args: Vec<String> = env::args().collect();
     
     let input = &args[1];
-    match &input[..] {
+    /* match &input[..] {
         "test" => parse_test_log(),
-        url_file_path => rate_repos::rate_repos(url_file_path, &mut io::stdout()),
-    };
+        url_file_path => rate_repos::rate_repos(url_file_path).await,
+    }; */
+    let rating: String = rate_repos::rate_repos(input).await;
+    //println!("{:?}", serde_json::to_string(&rating));
     Ok(())
 }
 
