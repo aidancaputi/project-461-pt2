@@ -6,9 +6,9 @@ FROM rust:1.63.0
 WORKDIR /usr/src/app
 COPY . .
 
-ENV GITHUB_TOKEN=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
-ENV LOG_LEVEL=2
-ENV LOG_FILE="log.txt"
+#ENV GITHUB_TOKEN=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
+#ENV LOG_LEVEL=2
+#ENV LOG_FILE="log.txt"
 
 # Install production dependencies and build a release artifact.
 #RUN cargo install --path pt1-server/server
