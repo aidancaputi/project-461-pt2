@@ -9,7 +9,7 @@ function handleFileSelected(file: File) {
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
+    <img alt="461 logo" class="logo" src="./assets/461.jpg" width="125" height="125" />
 
     <div class="wrapper">
       <HelloWorld msg="461 Project Vue Frontend" />
