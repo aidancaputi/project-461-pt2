@@ -3,7 +3,7 @@ use octocrab:: Octocrab;
 use serde::Deserialize;
 use std::sync::Arc;
 
-pub fn bus_factor_score(url: &str) -> f32 {
+pub async fn bus_factor_score(url: &str) -> f32 {
     simple_log::info!("Calculating Bus Factor Score.)");
 
     let token = std::env::var("GITHUB_TOKEN");
@@ -18,12 +18,12 @@ pub fn bus_factor_score(url: &str) -> f32 {
         }
     };
     let keywords = get_keywords(url);
-    let score = find_bf_score(&octocrab, keywords);
+    let score = find_bf_score(&octocrab, keywords).await;
 
     score
 }
 
-#[tokio::main]
+//#[tokio::main]
 async fn find_bf_score(octocrab: &Octocrab, (owner, repo): (&str, &str)) -> f32 {
     let repo = octocrab.repos(owner, repo).get().await.unwrap();
 

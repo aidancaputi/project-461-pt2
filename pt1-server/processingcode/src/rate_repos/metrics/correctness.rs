@@ -7,15 +7,15 @@ use std::sync::Arc;
 //use std::io::BufRead;
 
 
-pub fn calculate_correctness(url: &str) -> f32 {
+pub async fn calculate_correctness(url: &str) -> f32 {
     simple_log::info!("Calculating Correctness Score.");
     let starrating = calc_stars(url);
    // let assertrating = calc_asserts(url);
     let result = starrating; 
-    result
+    result.await
 }
 
-#[tokio::main]
+//#[tokio::main]
 async fn calc_stars(url: &str) -> f32 {
     
     let stars: f32 = make_star_request(url).await;
@@ -32,8 +32,14 @@ async fn make_star_request(url: &str) -> f32 {
     let query = format!("query{{repository(owner:\"{owner}\", name:\"{repo}\"){{stargazerCount}}}}");
     let token = std::env::var("GITHUB_TOKEN");
     let octocrab = match token {
-        Ok(t) => Arc::new(Octocrab::builder().personal_token(t).build().unwrap()),
-        Err(_e) => panic!("Unable to authenticate with github token (check env variables)"),
+        Ok(t) => {
+            simple_log::debug!("Correctness Score: Used Github token.)");
+            Arc::new(Octocrab::builder().personal_token(t).build().unwrap())
+        }
+        Err(_e) => {
+            simple_log::debug!("Correctness Score: Did not use Github token.");
+            octocrab::instance()
+        }
     };
     let response: serde_json::Value = octocrab
     .graphql(&query)

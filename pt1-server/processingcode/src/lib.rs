@@ -1,7 +1,7 @@
 pub mod rate_repos {
 
     use serde::{Serialize, Deserialize};
-    use std::io;
+    //use std::io;
 
     pub mod metrics {
         use super::*;
@@ -36,14 +36,14 @@ pub mod rate_repos {
         const RAMP_UP_WEIGHT: i32 = 0;
         const RESPONSIVE_MAINTAINER_WEIGHT: f32 = 0.4;
 
-        pub fn get_metrics(_url: &str) -> MetricScores {
+        pub async fn get_metrics(_url: &str) -> MetricScores {
             // each of these 0.5's will be a call each metric function in their file
             let mut scores = MetricScores {
                 net_score: 0.0,
                 ramp_up_score: -1,
-                bus_factor_score: bus_factor_score(_url),
-                correctness_score: calculate_correctness(_url) as f32,
-                responsive_maintainer_score: responsive_maintainer_score(_url),
+                bus_factor_score: bus_factor_score(_url).await,
+                correctness_score: calculate_correctness(_url).await as f32,
+                responsive_maintainer_score: responsive_maintainer_score(_url).await,
                 license_score: -1,
             };
 
@@ -94,78 +94,37 @@ pub mod rate_repos {
         }
     }
 
-    // fn validate_github_url(url: &str) -> Result<bool, ureq::Error> {
-    //     let repo_full_name = &url[19..];
-    //     let token = std::env::var("GITHUB_TOKEN").unwrap();
-    //     let http_url = format!("https://api.github.com/repos/{}", &repo_full_name);
-    //     let response = ureq::get(&http_url)
-    //                     .set("Authorization", &token[..])
-    //                     .call();
-    //     match response {
-    //         Ok(_r) => return Ok(true),
-    //         Err(_e) => return Ok(false),
-    //     };
-    // }
-
-    pub fn rate_repos(url_file_path: &str, stdout: &mut dyn io::Write) {
-        use std::fs;
+    pub async fn rate_repos(url: &str) -> String{
+        //use std::fs;
         simple_log::info!("Parsing url file.");
-        let file_contents = fs::read_to_string(url_file_path).expect("Unable to read file");
-        let urls = file_contents.lines();
+        
+        //open file and get urls from it
+        //let file_contents = fs::read_to_string(url_file_path).expect("Unable to read file");
+        //let urls = file_contents.lines();
 
         let mut url_specs: Vec<UrlSpecs> = Vec::new();
 
         simple_log::info!("Obtaining github urls.");
         simple_log::info!("Calling metric score calculation functions.");
-        for url in urls {
+        //for url in urls {
             if &url[0..22] == "https://www.npmjs.com/" {
                 let github_url = get_github_url_for_npm(&url).unwrap();
                 if &github_url[0..19] == "https://github.com/" {
                     // if validate_github_url(&github_url).unwrap() {
                         let url_spec = UrlSpecs {
                             url: url.to_string(),
-                            metric_scores: metrics::get_metrics(&github_url),
+                            metric_scores: metrics::get_metrics(&github_url).await,
                         };
                         url_specs.push(url_spec);
-                    // }
-                    // else {
-                    //     let url_spec = UrlSpecs {
-                    //         url: url.to_string(),
-                    //         metric_scores: metrics::MetricScores {
-                    //             net_score: 0.0,
-                    //             ramp_up_score: -1,
-                    //             correctness_score: 0.0,
-                    //             bus_factor_score: 0.0,
-                    //             responsive_maintainer_score: 0.0,
-                    //             license_score: 0.0,
-                    //         },
-                    //     };
-                    //     url_specs.push(url_spec);
-                    // }
                 }
             }
             else if &url[0..19] == "https://github.com/" {
                 // /if validate_github_url(&url).unwrap() {
                     let url_spec = UrlSpecs {
                         url: url.to_string(),
-                        metric_scores: metrics::get_metrics(&url),
+                        metric_scores: metrics::get_metrics(&url).await,
                     };
                     url_specs.push(url_spec);
-                // }
-                // else {
-                //     let url_spec = UrlSpecs {
-                //         url: url.to_string(),
-                //         metric_scores: metrics::MetricScores {
-                //             net_score: 0.0,
-                //             ramp_up_score: -1,
-                //             correctness_score: 0.0,
-                //             bus_factor_score: 0.0,
-                //             responsive_maintainer_score: 0.0,
-                //             license_score: 0.0,
-                //         },
-                //     };
-                //     url_specs.push(url_spec);
-                // }
             }
             else {
                 let url_spec = UrlSpecs {
@@ -181,7 +140,7 @@ pub mod rate_repos {
                 };
                 url_specs.push(url_spec);
             }
-        }
+        //}
 
         // sort the repos in decreasing order
         simple_log::info!("Sorting repos in decreasing order.");
@@ -192,15 +151,18 @@ pub mod rate_repos {
                 .unwrap()
         });
 
+
         simple_log::info!("Printing final score calculations.");
-        print_url_specs(&url_specs, stdout);
+        //print_url_specs(&url_specs, stdout);
+        
+        return serde_json::to_string(&url_specs).unwrap();
     }
 
-    pub fn print_url_specs(url_specs: &Vec<UrlSpecs>, stdout: &mut dyn io::Write) {
+    /*  pub fn print_url_specs(url_specs: &Vec<UrlSpecs>, stdout: &mut dyn io::Write) {
         for repo_info in url_specs {
             writeln!(stdout, "{}", serde_json::to_string(&repo_info).unwrap()).unwrap();
         }
-    }
+    }  */
 }
 
 #[cfg(test)]
