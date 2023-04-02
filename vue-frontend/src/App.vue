@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
 import SearchBar from './components/SearchBar.vue'
+import UploadButton from './components/UploadButton.vue'
+function handleFileSelected(file: File) {
+  // Do something with the selected file
+}
 </script>
 
 <template>
@@ -15,6 +19,16 @@ import SearchBar from './components/SearchBar.vue'
   <main>
     <SearchBar />
   </main>
+
+  <div>
+    <h1>Upload File</h1>
+    <UploadButton
+      accept=".pdf,.doc,.docx"
+      multiple
+      @file-selected="handleFileSelected"
+    />
+  </div>
+  
 </template>
 
 <style scoped>
