@@ -9,8 +9,8 @@ defineProps<{
     <h1 class="green">{{ msg }}</h1>
     <h3>
       While Aidan and Dheepa are on the backend, the frontend developers are
-      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Zane</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Josh</a>.
+      <a href="https://www.linkedin.com/in/zane-middaugh-ab87701bb/" target="_blank" rel="noopener">Zane</a> +
+      <a href="https://www.linkedin.com/in/joshchristian280/" target="_blank" rel="noopener">Josh</a>.
     </h3>
   </div>
 </template>
