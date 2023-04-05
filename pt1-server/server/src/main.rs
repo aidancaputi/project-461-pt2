@@ -35,7 +35,7 @@ use hyper::{
          }))
       });
    
-      let server = Server::bind(&addr).serve(make_svc);
+      let server = Server::bind(&addr).serve(make_svc); //test
    
       println!("Listening on http://{}", addr);
       if let Err(e) = server.await {
