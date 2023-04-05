@@ -27,20 +27,15 @@ use hyper::{
       let addr = ([0, 0, 0, 0], port).into();
    
       let make_svc = make_service_fn(|_socket: &AddrStream| async move {
-         Ok::<_, Infallible>(service_fn(move |_: Request<Body>| async move {
-               //let mut hello = "Hello ".to_string();
-               let mut hello = purdue461_cli::rate_repos::rate_repos("https://www.npmjs.com/package/express").await;
-               match env::var("TARGET") {
-                  Ok(target) => {
-                     hello.push_str(&target);
-                  }
-                  Err(_e) => hello.push_str("World"),
-               };
-               Ok::<_, Infallible>(Response::new(Body::from(hello)))
+         Ok::<_, Infallible>(service_fn(move |_req: Request<Body>| async move {
+               let mut req_url = &(_req.uri().to_string())[1..];
+               println!("{}" , req_url);
+               let mut url_metrics = purdue461_cli::rate_repos::rate_repos(req_url).await;
+               Ok::<_, Infallible>(Response::new(Body::from(url_metrics)))
          }))
       });
    
-      let server = Server::bind(&addr).serve(make_svc);
+      let server = Server::bind(&addr).serve(make_svc); //test
    
       println!("Listening on http://{}", addr);
       if let Err(e) = server.await {
