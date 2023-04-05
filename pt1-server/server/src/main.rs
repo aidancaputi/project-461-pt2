@@ -28,7 +28,6 @@ use hyper::{
    
       let make_svc = make_service_fn(|_socket: &AddrStream| async move {
          Ok::<_, Infallible>(service_fn(move |_req: Request<Body>| async move {
-               //let mut hello = "Hello ".to_string();
                let mut req_url = &(_req.uri().to_string())[1..];
                println!("{}" , req_url);
                let mut url_metrics = purdue461_cli::rate_repos::rate_repos(req_url).await;
@@ -37,8 +36,6 @@ use hyper::{
       });
    
       let server = Server::bind(&addr).serve(make_svc);
-
-      //println!("{}", make_svc);
    
       println!("Listening on http://{}", addr);
       if let Err(e) = server.await {
