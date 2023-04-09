@@ -8,7 +8,7 @@ app = Flask(__name__)
 #this is a dummy function to get the metrics that would be returned from part 1 code
 #in practice, this would call the part 1 code on the package provided
 def getMetrics(package_url):
-    request_url = "https://pt1-server-h5si5ezrea-uc.a.run.app" + package_url
+    request_url = "https://pt1-server-h5si5ezrea-uc.a.run.app/" + package_url
     test_metrics = requests.get(request_url) #this is HTTP response
     return test_metrics.content.decode() #decode the content (metrics) 
 
