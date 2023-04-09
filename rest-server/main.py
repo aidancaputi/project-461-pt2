@@ -8,9 +8,10 @@ app = Flask(__name__)
 #this is a dummy function to get the metrics that would be returned from part 1 code
 #in practice, this would call the part 1 code on the package provided
 def getMetrics(package_url):
-    request_url = "https://pt1-server-h5si5ezrea-uc.a.run.app/" + package_url
-    test_metrics = requests.get(request_url) #this is HTTP response
-    return test_metrics.content.decode() #decode the content (metrics) 
+    pt1_url = "https://pt1-server-h5si5ezrea-uc.a.run.app/" #url of pt1 server
+    request_url = pt1_url + package_url #add the package url to the end of the pt1 url
+    test_metrics = requests.get(request_url) #send the request to pt1 server
+    return test_metrics.content.decode() #decode the content of response (metrics) 
 
 #this is a dummy function that would query the database for all the package names we have
 #in practice, this will connect to the database and get a list of all package names in the database
