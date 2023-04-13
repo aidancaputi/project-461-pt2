@@ -17,8 +17,15 @@ function handleFileSelected(file: File) {
   </header>
 
   <main>
-    <SearchBar />
-  </main>
+  <Suspense>
+    <template #default>
+      <SearchBar />
+    </template>
+    <template #fallback>
+      <span>Loading...</span>
+    </template>
+  </Suspense>
+</main>
 
   <div>
     <h1>Upload File</h1>
@@ -28,7 +35,7 @@ function handleFileSelected(file: File) {
       @file-selected="handleFileSelected"
     />
   </div>
-  
+
 </template>
 
 <style scoped>

@@ -1,7 +1,29 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import axios from 'axios';
+
+
+var sync_resp : any;
+sync_resp = axios.get('http://localhost:8080/packages').then((response) => {return(response)});
+
+// the response of the request is now stored in resp
+const resp = await sync_resp;
+
+console.log("api get request response: ",resp)
+var raw = resp.data.pkg
+var re : RegExp = /\'|\[|\]|\ /g;
+var filtered = raw.replace(re,'')
+var pkg_array = filtered.split(',')
+
+console.log(pkg_array)
+
+
 let input = ref("");
-const packages = ["package1", "package2", "package3"];
+
+
+//const packages = ["package1", "package2", "package3"];
+const packages = pkg_array;
+
 function filteredList() {
   return packages.filter((packages) =>
     packages.toLowerCase().includes(input.value.toLowerCase())
