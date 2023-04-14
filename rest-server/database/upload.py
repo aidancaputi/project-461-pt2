@@ -1,6 +1,7 @@
 from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import pathlib
+import os
 
 # Python Connector database creator function
 def getconn():
@@ -9,7 +10,7 @@ def getconn():
             "ece-461-project-2-database:us-central1:ece-461-main-database", # Cloud SQL Instance Connection Name
             "pymysql",
             user="root",
-            password=insert_password,
+            password=os.environ['DBPW'],
             db="ece461project2",
             timeout=120,
             ip_type=IPTypes.PUBLIC # public IP
@@ -30,7 +31,7 @@ def create_table():
     with pool.connect() as db_conn:
         db_conn.execute(
             sqlalchemy.text(
-            "CREATE TABLE IF NOT EXISTS packages "
+            "CREATE TABLE IF NOT EXISTS testtable "
             "( id SERIAL NOT NULL, name VARCHAR(255) NOT NULL, "
             "rating INT, version FLOAT NOT NULL, "
             "package_zip LONGBLOB NOT NULL, "

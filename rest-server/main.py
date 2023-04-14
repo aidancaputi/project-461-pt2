@@ -1,4 +1,5 @@
 import os
+from database import upload
 
 from flask import Flask
 
@@ -42,6 +43,11 @@ def getPackageInfo(package_name):
 def hello_world():
     name = os.environ.get("NAME", "World")
     return "Hello {}!".format(name)
+
+@app.route("/createtable")
+def hello_world():
+    upload.create_table() 
+    return "Created table!"
 
 #this is the packages url, it should list all the packages we have
 @app.route('/packages')
