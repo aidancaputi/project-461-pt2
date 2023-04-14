@@ -22,7 +22,7 @@ function handleFileSelected(file: File) {
       <SearchBar />
     </template>
     <template #fallback>
-      <span>Loading...</span>
+      <span>Loading package search...</span>
     </template>
   </Suspense>
 </main>

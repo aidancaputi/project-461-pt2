@@ -2,30 +2,42 @@
 import { ref } from "vue";
 import axios from 'axios';
 
-
-var sync_resp : any;
-sync_resp = axios.get('http://localhost:8080/packages').then((response) => {return(response)});
-
 // the response of the request is now stored in resp
-const resp = await sync_resp;
+// if request failed resp will be null
+const resp : any = await callPackageAPI();
 
 console.log("api get request response: ",resp)
-var raw = resp.data.pkg
-var re : RegExp = /\'|\[|\]|\ /g;
-var filtered = raw.replace(re,'')
-var pkg_array = filtered.split(',')
 
-console.log(pkg_array)
-
+if (resp != null) {
+  var raw = resp.data.pkg;
+  var re : RegExp = /\'|\[|\]|\ /g;
+  var filtered = raw.replace(re,'');
+  var pkg_array = filtered.split(',');
+  console.log(pkg_array);
+} else {
+  pkg_array = ['api failed','make sure it\'s running'];
+}
 
 let input = ref("");
+var packages : any = pkg_array;
 
+async function callPackageAPI() {
+  try {
 
-//const packages = ["package1", "package2", "package3"];
-const packages = pkg_array;
+  const sync_resp = await axios.get('http://localhost:8080/packages').then((response) => {return(response)});
+
+  return(sync_resp);
+
+  } catch(error) {
+
+    console.log("API failed to retrieve packages")
+
+    return(null);
+  }
+}
 
 function filteredList() {
-  return packages.filter((packages) =>
+  return packages.filter((packages: String) =>
     packages.toLowerCase().includes(input.value.toLowerCase())
   );
 }
