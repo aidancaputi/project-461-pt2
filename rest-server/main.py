@@ -1,9 +1,9 @@
 import os
 from database import upload
 
-from flask import Flask
+import flask
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 #this is a dummy function to get the metrics that would be returned from part 1 code
 #in practice, this would call the part 1 code on the package provided
@@ -53,7 +53,11 @@ def hello_world():
 @app.route('/packages')
 def list_packages():
     all_package_names = queryAllPackages()
-    return "Here are all of the packages we have in our system:\n {}!".format(all_package_names)
+    str_resp = str(format(all_package_names))
+    response = flask.jsonify({'pkg':str_resp})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 #this be the "info page" about a certain package
 #it should list the general information about a package
