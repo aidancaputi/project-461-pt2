@@ -45,7 +45,7 @@ def hello_world():
     return "Hello {}!".format(name)
 
 @app.route("/createtable")
-def hello_world():
+def table_init():
     upload.create_table() 
     return "Created table!"
 
