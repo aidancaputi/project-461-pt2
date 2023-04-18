@@ -73,6 +73,11 @@ def get_metrics(package_name):
     package_metrics = getMetrics(package_name)
     return "Here are the metrics you asked for:\n {}!".format(package_metrics)
 
+# /reset
+@app.route("/reset", methods = ['DELETE'])
+def reset(): 
+    return "Reset table!"
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
