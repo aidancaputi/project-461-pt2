@@ -60,7 +60,7 @@ def list_packages():
     return response
 
 # /package
-@app.route('/package', methods = ['PUT'])
+@app.route('/package', methods = ['POST'])
 def add_package():
     # add package to database here -------------------------------------------------
     return "Package added!"
