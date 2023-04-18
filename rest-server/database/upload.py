@@ -11,7 +11,7 @@ def getconn():
             "pymysql",
             user="root",
             password=os.environ['DBPW'],
-            db="ece461project2",
+            db="packages_database",
             timeout=120,
             ip_type=IPTypes.PUBLIC # public IP
         )
@@ -31,10 +31,11 @@ def create_table():
     with pool.connect() as db_conn:
         db_conn.execute(
             sqlalchemy.text(
-            "CREATE TABLE IF NOT EXISTS testtable "
-            "( id SERIAL NOT NULL, name VARCHAR(255) NOT NULL, "
-            "rating INT, version FLOAT NOT NULL, "
-            "package_zip LONGBLOB NOT NULL, "
+            "CREATE TABLE IF NOT EXISTS packages "
+            "(ID VARCHAR(255) NOT NULL, "
+            "Name VARCHAR(255) NOT NULL, "
+            "Version FLOAT NOT NULL, "
+            "Zip LONGBLOB NOT NULL, "
             "PRIMARY KEY (id));"
             )
         )
@@ -42,44 +43,41 @@ def create_table():
     db_conn.commit() # commit transaction 
 
 # upload a new package
-def upload_package(name, rating, version, package_zip):
+def upload_package(name, id, version, package_zip):
     pool = authenticate()
     with pool.connect() as db_conn:
         # insert data into table
         insert_stmt = sqlalchemy.text(
-            "INSERT INTO packages (name, rating, version, package_zip) VALUES (:name, :rating, :version, :package_zip)",
+            "INSERT INTO packages (ID, Name, Version, Zip) VALUES (:ID, :Name, :Version, :Zip)",
         )
 
         # insert entries into table
-        db_conn.execute(insert_stmt, parameters={"name": name, "rating": rating, "version": version, "package_zip": package_zip})
+        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Zip": package_zip})
 
         # commit transactions
         db_conn.commit()
 
-def download_package(download_location, id):
+# download a package from its id
+def download_package(id):
     pool = authenticate()
     with pool.connect() as db_conn:
         # query and fetch data
-        name = db_conn.execute(sqlalchemy.text("SELECT name FROM packages")).fetchall()
-        rating = db_conn.execute(sqlalchemy.text("SELECT rating FROM packages")).fetchall()
-        version = db_conn.execute(sqlalchemy.text("SELECT version FROM packages")).fetchall()
+        name = db_conn.execute(sqlalchemy.text("SELECT Name FROM packages")).fetchall()
+        version = db_conn.execute(sqlalchemy.text("SELECT Version FROM packages")).fetchall()
         package_zip = db_conn.execute(sqlalchemy.text("SELECT package_zip FROM packages")).fetchall()
 
-        # show results
-        print(name[id])
-        print(rating[id])
-        print(version[id])
+        return {version[id][0], name[id][0], id, package_zip[id][0]}
 
-        with open(download_location, "wb") as f:
-            f.write(package_zip[id][0])
+# reset database, delete all tables and go back to default state
+def reset_database():
+    pool = authenticate()
+    with pool.connect() as db_conn:
+        # delete old database
+        db_conn.execute(sqlalchemy.text('DROP DATABASE IF EXISTS packages_database'))
+        db_conn.commit() # commit transaction 
 
-'''
-name = "package1"
-rating = 4
-version = 1.4
-package_zip = pathlib.Path("C:\\Users\joshc\Desktop\\testupload.zip").read_bytes()
+        # create new database
+        db_conn.execute(sqlalchemy.text('CREATE DATABASE packages_database'))
+        db_conn.commit() # commit transaction 
 
-#create_table()
-#upload_package(name, rating, version, package_zip)
-#download_package("C:\\Users\joshc\Desktop\\testupload2.zip", 0)
-'''
+        create_table()
