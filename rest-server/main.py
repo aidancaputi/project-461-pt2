@@ -50,7 +50,7 @@ def table_init():
     return "Created table!"
 
 #this is the packages url, it should list all the packages we have
-@app.route('/packages')
+@app.route('/packages', methods = ['POST'])
 def list_packages():
     all_package_names = queryAllPackages()
     str_resp = str(format(all_package_names))
