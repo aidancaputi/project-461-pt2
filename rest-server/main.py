@@ -38,17 +38,6 @@ def getPackageInfo(package_name):
         }
     return test_info
 
-#this is the home url of the server
-""" @app.route("/")
-def hello_world():
-    name = os.environ.get("NAME", "World")
-    return "Hello {}!".format(name) """
-
-""" @app.route("/createtable")
-def table_init():
-    upload.create_table() 
-    return "Created table!" """
-
 # /packages
 @app.route('/packages', methods = ['POST'])
 def list_packages():
@@ -65,24 +54,11 @@ def add_package():
     # add package to database here -------------------------------------------------
     return "Package added!"
 
-#this be the "info page" about a certain package
-#it should list the general information about a package
-""" @app.route("/packages/<package_name>")
-def package_info(package_name):
-    info = getPackageInfo(package_name)
-    return "Here is the information we have on the package you wanted:\n {}!".format(info) """
-
-#this will be the metrics page for a certain object
-#it will run the part 1 code on the package
-""" @app.route("/packages/<package_name>/metrics")
-def get_metrics(package_name):
-    package_metrics = getMetrics(package_name)
-    return "Here are the metrics you asked for:\n {}!".format(package_metrics) """
-
 # /reset
 @app.route("/reset", methods = ['DELETE'])
 def reset(): 
     #delete all stuff in database here --------------------------------------------------------
+    upload.reset_database()
     return "Reset table!"
 
 
