@@ -73,6 +73,6 @@ def reset_database():
     with pool.connect() as db_conn:
         # delete old database
         db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS packages'))
-        db_conn.commit() # commit transaction 
+        db_conn.commit() # commit transaction f
         
         create_table()
