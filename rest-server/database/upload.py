@@ -1,6 +1,5 @@
 from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
-import pathlib
 import os
 
 # Python Connector database creator function
@@ -73,11 +72,7 @@ def reset_database():
     pool = authenticate()
     with pool.connect() as db_conn:
         # delete old database
-        db_conn.execute(sqlalchemy.text('DROP DATABASE IF EXISTS packages_database'))
+        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS packages'))
         db_conn.commit() # commit transaction 
-
-        # create new database
-        db_conn.execute(sqlalchemy.text('CREATE DATABASE packages_database'))
-        db_conn.commit() # commit transaction 
-
+        
         create_table()
