@@ -1,23 +1,10 @@
 import os
 from database import upload
+import json
 
 import flask
 
 app = flask.Flask(__name__)
-
-#this is a dummy function to get the metrics that would be returned from part 1 code
-#in practice, this would call the part 1 code on the package provided
-def getMetrics(package_name):
-    test_metrics = {
-        package_name : {"URL": package_name, 
-                        "NET_SCORE": 1.0, 
-                        "RAMP_UP_SCORE": 1.0, 
-                        "CORRECTNESS_SCORE": 1.0, 
-                        "BUS_FACTOR_SCORE": 1.0, 
-                        "RESPONSIVE_MAINTAINER_SCORE": 1.0, 
-                        "LICENSE_SCORE": 1.0},
-        }
-    return test_metrics
 
 #this is a dummy function that would query the database for all the package names we have
 #in practice, this will connect to the database and get a list of all package names in the database
@@ -54,12 +41,44 @@ def add_package():
     # add package to database here -------------------------------------------------
     return "Package added!"
 
+# GET /package/{id}/rate
+@app.route("/package/<package_id>/rate")
+def get_metrics(package_name):
+
+    #get URL using package ID
+
+    #use the URL to make request to pt1 server
+
+    #format that response as the required json then return it
+
+    return
+
 # /reset
 @app.route("/reset", methods = ['DELETE'])
 def reset(): 
     #delete all stuff in database here --------------------------------------------------------
     upload.reset_database()
-    return "Reset table!"
+    return
+
+# PUT /package/{id}
+@app.route("/package/<id>", methods = ['PUT'])
+def put_by_id(id):
+
+    #get the request content json
+    content = flask.request.get_json()
+
+    #extract all the info from the request json
+    put_id = content.get('ID')
+    put_name = content.get('Name')
+    put_Version = content.get('Version')
+    put_content = content.get('Content')
+    put_name = content.get('Name')
+    put_URL = content.get('URL')
+    put_JSProgram = content.get('JSProgram')
+    
+    #use request info above to update database now
+    
+    return
 
 
 if __name__ == "__main__":
