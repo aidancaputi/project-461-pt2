@@ -65,20 +65,20 @@ def reset():
 def put_by_id(id):
 
     #get the request content json
-    content = flask.request.get_json()
+    #content = flask.request.get_json()
 
     #extract all the info from the request json -- FUTURE: WHY DONT THESE WORK
-    put_id = content.get('ID')
-    put_name = content.get('Name')
-    put_Version = content.get('Version')
-    put_content = content.get('Content')
-    put_name = content.get('Name')
-    put_URL = content.get('URL')
-    put_JSProgram = content.get('JSProgram')
+    put_id = flask.request.form.get('ID')
+    put_name = flask.request.form.get('Name')
+    put_Version = flask.request.form.get('Version')
+    put_content = flask.request.form.get('Content')
+    put_name = flask.request.form.get('Name')
+    put_URL = flask.request.form.get('URL')
+    put_JSProgram = flask.request.form.get('JSProgram')
     
     #use request info above to update database now
     
-    return 'OK'
+    return str(put_id)
 
 
 if __name__ == "__main__":
