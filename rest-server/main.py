@@ -1,6 +1,5 @@
 import os
 from database import upload
-import json
 
 import flask
 
@@ -65,17 +64,16 @@ def reset():
 def put_by_id(id):
 
     #get the request content json
-    #content = flask.request.get_json()
+    request_content = flask.request.get_json()
 
     #extract all the info from the request json -- FUTURE: WHY DONT THESE WORK
-    put_id = flask.request.form.get('ID')
-    put_name = flask.request.form.get('Name')
-    put_Version = flask.request.form.get('Version')
-    put_content = flask.request.form.get('Content')
-    put_name = flask.request.form.get('Name')
-    put_URL = flask.request.form.get('URL')
-    put_JSProgram = flask.request.form.get('JSProgram')
-    
+    put_id = request_content['metadata']['ID']
+    put_name = request_content['metadata']['Name']
+    put_Version = request_content['metadata']['Version']
+    put_content = request_content['data']['Content']
+    put_URL = request_content['data']['URL']
+    put_JSProgram = request_content['data']['JSProgram']
+        
     #use request info above to update database now
     
     return str(put_id)
