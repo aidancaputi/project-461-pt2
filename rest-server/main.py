@@ -1,6 +1,6 @@
 import os
-from database import upload
-
+from database import databaseFunctions
+import base64
 import flask
 
 app = flask.Flask(__name__)
@@ -48,10 +48,20 @@ def add_package():
         url = request_content['URL']
     
     if content == 0:
-        # add url to database
+        # url
+
+        package_name = 'get_package_name'
+        package_version = 'get_package_version'
+        package_url = 'get_package_url'
+        databaseFunctions.upload_package(package_name, package_version, None, package_url)
         pass
     else:
         #add content to database
+
+        package_name = 'get_package_name'
+        package_version = 'get_package_version'
+        package_zip = 'get_zip_file'
+        databaseFunctions.upload_package(package_name, package_version, package_zip, None)
         pass
 
     return "Package added!"
@@ -72,7 +82,7 @@ def get_metrics(package_name):
 @app.route("/reset", methods = ['DELETE'])
 def reset(): 
     #delete all stuff in database here --------------------------------------------------------
-    upload.reset_database()
+    databaseFunctions.reset_database()
     return
 
 # PUT /package/{id}
