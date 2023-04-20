@@ -5,20 +5,6 @@ import flask
 
 app = flask.Flask(__name__)
 
-#this is a dummy function to get the metrics that would be returned from part 1 code
-#in practice, this would call the part 1 code on the package provided
-def getMetrics(package_name):
-    test_metrics = {
-        package_name : {"URL": package_name, 
-                        "NET_SCORE": 1.0, 
-                        "RAMP_UP_SCORE": 1.0, 
-                        "CORRECTNESS_SCORE": 1.0, 
-                        "BUS_FACTOR_SCORE": 1.0, 
-                        "RESPONSIVE_MAINTAINER_SCORE": 1.0, 
-                        "LICENSE_SCORE": 1.0},
-        }
-    return test_metrics
-
 #this is a dummy function that would query the database for all the package names we have
 #in practice, this will connect to the database and get a list of all package names in the database
 def queryAllPackages():
@@ -38,19 +24,8 @@ def getPackageInfo(package_name):
         }
     return test_info
 
-#this is the home url of the server
-@app.route("/")
-def hello_world():
-    name = os.environ.get("NAME", "World")
-    return "Hello {}!".format(name)
-
-@app.route("/createtable")
-def table_init():
-    upload.create_table() 
-    return "Created table!"
-
-#this is the packages url, it should list all the packages we have
-@app.route('/packages')
+# /packages
+@app.route('/packages', methods = ['POST'])
 def list_packages():
     all_package_names = queryAllPackages()
     str_resp = str(format(all_package_names))
@@ -59,19 +34,102 @@ def list_packages():
 
     return response
 
-#this be the "info page" about a certain package
-#it should list the general information about a package
-@app.route("/packages/<package_name>")
-def package_info(package_name):
-    info = getPackageInfo(package_name)
-    return "Here is the information we have on the package you wanted:\n {}!".format(info)
+# /package
+@app.route('/package', methods = ['POST'])
+def add_package():
+    # add package to database here -------------------------------------------------
+    request_content = flask.request.get_json()
+    content = 0
+    url = 0
 
-#this will be the metrics page for a certain object
-#it will run the part 1 code on the package
-@app.route("/packages/<package_name>/metrics")
+    try:
+        content = request_content['Content']
+    except:
+        url = request_content['URL']
+    
+    if content == 0:
+        # add url to database
+        pass
+    else:
+        #add content to database
+        pass
+
+    return "Package added!"
+
+# GET /package/{id}/rate
+@app.route("/package/<package_id>/rate")
 def get_metrics(package_name):
-    package_metrics = getMetrics(package_name)
-    return "Here are the metrics you asked for:\n {}!".format(package_metrics)
+
+    #get URL using package ID
+
+    #use the URL to make request to pt1 server
+
+    #format that response as the required json then return it
+
+    return
+
+# /reset
+@app.route("/reset", methods = ['DELETE'])
+def reset(): 
+    #delete all stuff in database here --------------------------------------------------------
+    upload.reset_database()
+    return
+
+# PUT /package/{id}
+
+@app.route("/package/<id>", methods = ['PUT','GET','DELETE'])
+def put_by_id(id):
+
+    if flask.request.method == 'PUT':
+        #get the request content json
+        request_content = flask.request.get_json()
+
+        #extract all the info from the request json
+        put_id = request_content['metadata']['ID']
+        put_name = request_content['metadata']['Name']
+        put_Version = request_content['metadata']['Version']
+        put_content = request_content['data']['Content']
+        put_URL = request_content['data']['URL']
+        put_JSProgram = request_content['data']['JSProgram']
+
+        #use request info above to update database now
+        
+        return str(put_id) + " " + str(id)
+    
+    elif flask.request.method == 'GET':
+        # send query to get <id> in variable id
+
+        return str(id)
+    
+    elif flask.request.method == 'DELETE':
+        # send query to delete <id> in variable id
+
+        return str(id)
+
+@app.route("/authenticate", methods = ['PUT'])
+
+def authenticate():
+    # authenticate not implemented
+
+    return "Not Implemented",501
+
+@app.route("/package/byName/<name>", methods = ['GET','DELETE'])
+
+def pkgbyName(name):
+    if flask.request.method == 'GET':
+        pass
+        # query database using name variable
+    elif flask.request.method == 'DELETE':
+        pass
+        # delete name from database
+    
+    return
+
+# @app.route("/package/byRegEx", methods = ['POST'])
+# def byRegEx():
+
+
+
 
 
 if __name__ == "__main__":
