@@ -38,6 +38,22 @@ def list_packages():
 @app.route('/package', methods = ['POST'])
 def add_package():
     # add package to database here -------------------------------------------------
+    request_content = flask.request.get_json()
+    content = 0
+    url = 0
+
+    try:
+        content = request_content['Content']
+    except:
+        url = request_content['URL']
+    
+    if content == 0:
+        # add url to database
+        pass
+    else:
+        #add content to database
+        pass
+
     return "Package added!"
 
 # GET /package/{id}/rate
@@ -60,23 +76,60 @@ def reset():
     return
 
 # PUT /package/{id}
-@app.route("/package/<id>", methods = ['PUT'])
+
+@app.route("/package/<id>", methods = ['PUT','GET','DELETE'])
 def put_by_id(id):
 
-    #get the request content json
-    request_content = flask.request.get_json()
+    if flask.request.method == 'PUT':
+        #get the request content json
+        request_content = flask.request.get_json()
 
-    #extract all the info from the request json
-    put_id = request_content['metadata']['ID']
-    put_name = request_content['metadata']['Name']
-    put_Version = request_content['metadata']['Version']
-    put_content = request_content['data']['Content']
-    put_URL = request_content['data']['URL']
-    put_JSProgram = request_content['data']['JSProgram']
+        #extract all the info from the request json
+        put_id = request_content['metadata']['ID']
+        put_name = request_content['metadata']['Name']
+        put_Version = request_content['metadata']['Version']
+        put_content = request_content['data']['Content']
+        put_URL = request_content['data']['URL']
+        put_JSProgram = request_content['data']['JSProgram']
 
-    #use request info above to update database now
+        #use request info above to update database now
+        
+        return str(put_id) + " " + str(id)
     
-    return str(put_id) + " " + str(id)
+    elif flask.request.method == 'GET':
+        # send query to get <id> in variable id
+
+        return str(id)
+    
+    elif flask.request.method == 'DELETE':
+        # send query to delete <id> in variable id
+
+        return str(id)
+
+@app.route("/authenticate", methods = ['PUT'])
+
+def authenticate():
+    # authenticate not implemented
+
+    return "Not Implemented",501
+
+@app.route("/package/byName/<name>", methods = ['GET','DELETE'])
+
+def pkgbyName(name):
+    if flask.request.method == 'GET':
+        pass
+        # query database using name variable
+    elif flask.request.method == 'DELETE':
+        pass
+        # delete name from database
+    
+    return
+
+# @app.route("/package/byRegEx", methods = ['POST'])
+# def byRegEx():
+
+
+
 
 
 if __name__ == "__main__":
