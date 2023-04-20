@@ -66,17 +66,17 @@ def put_by_id(id):
     #get the request content json
     request_content = flask.request.get_json()
 
-    #extract all the info from the request json -- FUTURE: WHY DONT THESE WORK
+    #extract all the info from the request json
     put_id = request_content['metadata']['ID']
     put_name = request_content['metadata']['Name']
     put_Version = request_content['metadata']['Version']
     put_content = request_content['data']['Content']
     put_URL = request_content['data']['URL']
     put_JSProgram = request_content['data']['JSProgram']
-        
+
     #use request info above to update database now
     
-    return str(put_id)
+    return str(put_id) + " " + str(id)
 
 
 if __name__ == "__main__":
