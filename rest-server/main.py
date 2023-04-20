@@ -78,7 +78,7 @@ def put_by_id(id):
     
     #use request info above to update database now
     
-    return 'OK'
+    return put_id
 
 
 if __name__ == "__main__":
