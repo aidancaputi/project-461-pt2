@@ -10,7 +10,7 @@ def getconn():
             "ece-461-project-2-database:us-central1:ece-461-main-database", # Cloud SQL Instance Connection Name
             "pymysql",
             user="root",
-            password=os.environ['DBPW'],
+            password= '461isSUPERcool!', #os.environ['DBPW'],
             db="packages_database",
             timeout=60,
             ip_type=IPTypes.PUBLIC # public IP
@@ -35,8 +35,9 @@ def create_table():
             "(ID VARCHAR(255) NOT NULL, "
             "Name VARCHAR(255) NOT NULL, "
             "Version VARCHAR(255) NOT NULL, "
-            "Content LONGBLOB, "
+            "Content MEDIUMTEXT NOT NULL, "
             "URL VARCHAR(255), "
+            "JSProgram MEDIUMTEXT NOT NULL, "
             "PRIMARY KEY (id));"
             )
         )
@@ -101,17 +102,7 @@ def get_package(id):
                 'data': {
                     'Content': row[3],
                     'URL': row[4],
-                }
-            }
-        elif row[4]: # only URL
-            package = {
-                'metadata': {
-                    'Name': row[1],
-                    'Version': row[2],
-                    'ID': row[0]
-                },
-                'data': {
-                    'URL': row[4],
+                    'JSProgram': row[5],
                 }
             }
         else: # only content
@@ -123,6 +114,7 @@ def get_package(id):
                 },
                 'data': {
                     'Content': row[3],
+                    'JSProgram': row[5],
                 }
             }
 
@@ -131,7 +123,7 @@ def get_package(id):
     return package
 
 # PUT /package/{id}
-def update_package(name, version, id, new_content, new_url):
+def update_package(name, version, id, new_content, new_url, new_jsprogram):
     pool = authenticate()
     with pool.connect() as db_conn:
         # query and fetch data
@@ -142,8 +134,8 @@ def update_package(name, version, id, new_content, new_url):
         # if package exists and matches update its content
         for row in package_data:
             if row[1] == name and row[2] == version:
-                db_conn.execute(sqlalchemy.text("UPDATE packages SET Content = :new_content, URL = :new_URL WHERE ID = :id"), 
-                                parameters={"new_content": new_content, "new_URL": new_url, "id": id})
+                db_conn.execute(sqlalchemy.text("UPDATE packages SET Content = :new_content, URL = :new_URL, JSProgram = :new_JSProgram WHERE ID = :id"), 
+                                parameters={"new_content": new_content, "new_URL": new_url, "new_JSProgram": new_jsprogram, "id": id})
                 db_conn.commit()
                 pool.dispose()
                 return 200
@@ -172,7 +164,7 @@ def delete_package(id):
     return 404 # matching package not found
 
 # POST /package
-def upload_package(name, version, content, url):
+def upload_package(name, version, content, url, jsprogram):
     pool = authenticate()
     with pool.connect() as db_conn:
         # search for package by content
@@ -204,10 +196,10 @@ def upload_package(name, version, content, url):
 
         # insert data into table
         insert_stmt = sqlalchemy.text(
-            "INSERT INTO packages (ID, Name, Version, Content, URL) VALUES (:ID, :Name, :Version, :Content, :URL)",)
+            "INSERT INTO packages (ID, Name, Version, Content, URL, JSProgram) VALUES (:ID, :Name, :Version, :Content, :URL, :JSProgram)",)
 
         # insert entries into table
-        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url})
+        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram})
         
         db_conn.commit() # commit transactions
     pool.dispose() # dispose connection
@@ -224,17 +216,7 @@ def upload_package(name, version, content, url):
             'data': {
                 'Content': content,
                 'URL': id,
-            }
-        }
-    elif url: # only URL
-        package = {
-            'metadata': {
-                'Name': name,
-                'Version': version,
-                'ID': id
-            },
-            'data': {
-                'URL': url,
+                'JSProgram': jsprogram,
             }
         }
     else: # only content
@@ -246,6 +228,7 @@ def upload_package(name, version, content, url):
             },
             'data': {
                 'Content': content,
+                'JSProrgam': jsprogram,
             }
         }
 
@@ -253,7 +236,10 @@ def upload_package(name, version, content, url):
 
 '''
 reset_database()
-upload_package("NewPackage", "1.2.3", None, "testurl")
-upload_package("AidanCaputi", "1.2.4", "testcontent", None)
-upload_package("Zane", "1.2.5", "zane", "bothurl")
+upload_package("NewPackage", "1.2.3", "testcontent", "testurl", "jsscript is super cool")
+upload_package("AidanCaputi", "1.2.4", "nourl", None, "this jsscript is useless")
+upload_package("Zane", "1.2.5", "zanecontent", "bothurl", "maybe this jssript does something")
+
+result = get_package('zane0')
+print(result)
 '''
