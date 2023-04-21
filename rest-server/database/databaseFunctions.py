@@ -172,7 +172,7 @@ def delete_package(id):
     return 404 # matching package not found
 
 # POST /package
-def upload_package(name, version, id, content, url):
+def upload_package(name, version, content, url):
     pool = authenticate()
     with pool.connect() as db_conn:
         # search for package by content
@@ -191,6 +191,17 @@ def upload_package(name, version, id, content, url):
             pool.dispose()
             return 409 # package exists with same URL
         
+        # new package will be uploaded
+        # create new ID for package
+        id, extranums = '', ''
+        for x in range(len(name)):
+            if (name[x].isupper()):
+                extranums = extranums + str(x)
+                id = id + name[x].lower()
+            else:
+                id = id + name[x]
+        id = id + extranums
+
         # insert data into table
         insert_stmt = sqlalchemy.text(
             "INSERT INTO packages (ID, Name, Version, Content, URL) VALUES (:ID, :Name, :Version, :Content, :URL)",)
@@ -242,7 +253,7 @@ def upload_package(name, version, id, content, url):
 
 '''
 reset_database()
-upload_package("NewPackage", "1.2.3", "newpackage", None, "testurl")
-upload_package("AidanCaputi", "1.2.4", "aidancaputi", "testcontent", None)
-upload_package("Zane", "1.2.5", "zane", "bothcontent", "bothurl")
+upload_package("NewPackage", "1.2.3", None, "testurl")
+upload_package("AidanCaputi", "1.2.4", "testcontent", None)
+upload_package("Zane", "1.2.5", "zane", "bothurl")
 '''
