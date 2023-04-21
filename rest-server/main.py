@@ -13,25 +13,6 @@ import stat
 
 app = flask.Flask(__name__)
 
-#this is a dummy function that would query the database for all the package names we have
-#in practice, this will connect to the database and get a list of all package names in the database
-def queryAllPackages():
-    test_packages = ["lodash", "pytorch", "tensorflow"]
-    return test_packages
-
-#this is a dummy function that would get all information about the package from the database and display it
-#in practice, this will connect to the database and get all info about a certain package
-def getPackageInfo(package_name):
-    test_info = {
-        package_name : {"name": package_name, 
-                        "users": 1000, 
-                        "downloads": 69, 
-                        "stars": 100, 
-                        "description": "This package does x, y, and z for you",
-                        },
-        }
-    return test_info
-
 # /packages
 @app.route('/packages', methods = ['POST'])
 def list_packages():
