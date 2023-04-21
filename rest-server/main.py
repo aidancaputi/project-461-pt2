@@ -2,6 +2,14 @@ import os
 from database import databaseFunctions
 import base64
 import flask
+from git import Repo
+import pathlib
+import zipfile
+import shutil
+import os
+import json
+from os import path
+import stat
 
 app = flask.Flask(__name__)
 
@@ -34,6 +42,79 @@ def list_packages():
 
     return response
 
+#takes a path to a folder and zips it, then encodes the zip into a base64 string
+def encode_repo(repo_path):
+    
+    #zip the folder
+    shutil.make_archive("repo_zip", 'zip', repo_path)
+
+    #encode the zip
+    with open("repo_zip.zip", "rb") as zipfile:
+        encoded = base64.b64encode(zipfile.read())
+
+    #return the encoded zip file
+    return encoded
+
+#takes a base 64 encoding then decodes and unzips it
+def convert_base64_and_unzip(encoded):
+
+    #open a zip and write the decoded file to it
+    with open('output_file.zip', 'wb') as result:
+        result.write(base64.b64decode(encoded))
+
+    #extract that file into folder with the name "cloned_repo"
+    zip_ref = zipfile.ZipFile("output_file.zip", 'r')
+    zip_ref.extractall("cloned_repo") 
+    zip_ref.close()
+
+#finds the package.json file in a folder and returns the path
+def find_package_json(path):
+    filename = "package.json"
+    for root, dirs, files in os.walk(path):
+        if filename in files:
+            return os.path.join(root, filename)
+
+#gets the metadata for the cloned repo
+def parse_for_info(need_url):
+
+    #find package.json in the cloned repo
+    filepath = find_package_json("cloned_repo")
+
+    #open the json file
+    package_json_file = open(filepath)
+
+    #get the json data
+    package_data = json.load(package_json_file)
+
+    #get name and version
+    name = package_data['name']
+    version = package_data['version']
+
+    #if we needed to get the url from the package json
+    if(need_url == True):
+        try: 
+            url = package_data['repository']['url']
+        except:
+            url = None
+
+        return name, version, url
+    
+    #if we didnt need the url, just return the name and version
+    return name, version
+
+#delete the given directory
+def clean_up(cloned_dir):
+
+    #delete the cloned repo
+    for root, dirs, files in os.walk("./cloned_repo"):  
+        for dir in dirs:
+            os.chmod(path.join(root, dir), stat.S_IRWXU)
+        for file in files:
+            os.chmod(path.join(root, file), stat.S_IRWXU)
+    shutil.rmtree('./cloned_repo')
+
+    os.rm("repo_zip.zip")
+
 # /package
 @app.route('/package', methods = ['POST'])
 def add_package():
@@ -48,21 +129,30 @@ def add_package():
         url = request_content['URL']
     
     if content == 0:
-        # url
+        #URL
+        
+        #clone the url
+        Repo.clone_from(url, "cloned_repo")
 
-        package_name = 'get_package_name'
-        package_version = 'get_package_version'
-        package_url = 'get_package_url'
-        databaseFunctions.upload_package(package_name, package_version, None, package_url)
-        pass
+        #parse the local repo for the name and version
+        package_name, package_version = parse_for_info(need_url=False)
+
+        #encode the cloned repo
+        encoding = encode_repo("cloned_repo")
+
+        databaseFunctions.upload_package(package_name, package_version, encoding, url)
     else:
-        #add content to database
+        #ENCODING
 
-        package_name = 'get_package_name'
-        package_version = 'get_package_version'
-        package_zip = 'get_zip_file'
-        databaseFunctions.upload_package(package_name, package_version, package_zip, None)
-        pass
+        #if encoded was set, decode it and unzip
+        convert_base64_and_unzip(content)
+
+        #parse the unzipped repo for the name, version, and url
+        package_name, package_version, package_url = parse_for_info(need_url=True)
+
+        databaseFunctions.upload_package(package_name, package_version, content, package_url)
+
+    clean_up("cloned_repo")
 
     return "Package added!"
 
