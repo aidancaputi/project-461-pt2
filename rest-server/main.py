@@ -2,6 +2,15 @@ import os
 from database import databaseFunctions
 import base64
 import flask
+import base64
+from git import Repo
+import pathlib
+import zipfile
+import shutil
+import os
+import json
+from os import path
+import stat
 
 app = flask.Flask(__name__)
 
@@ -23,6 +32,56 @@ def getPackageInfo(package_name):
                         },
         }
     return test_info
+
+def convert(encoded):
+
+    #open a zip and write the decoded file to it
+    with open('output_file.zip', 'wb') as result:
+        result.write(base64.b64decode(encoded))
+
+    #extract that file into folder with the name "cloned_repo"
+    zip_ref = zipfile.ZipFile("output_file.zip", 'r')
+    zip_ref.extractall("cloned_repo") 
+    zip_ref.close()
+
+def find_package_json(path):
+    filename = "package.json"
+    for root, dirs, files in os.walk(path):
+        if filename in files:
+            return os.path.join(root, filename)
+
+#gets name, version, and url from cloned repo
+def parse_for_info():
+
+    #find package.json in the cloned repo
+    filepath = find_package_json("cloned_repo")
+
+    #print(filepath)
+
+    #open the json file
+    package_json_file = open(filepath)
+
+    #get the json data
+    package_data = json.load(package_json_file)
+
+    #get name and version
+    name = package_data['name']
+    version = package_data['version']
+    try: 
+        url = package_data['repository']['url']
+    except:
+        url = None
+
+    return name, version, url
+
+#delete the directory
+def clean_up(cloned_dir):
+    for root, dirs, files in os.walk("./cloned_repo"):  
+        for dir in dirs:
+            os.chmod(path.join(root, dir), stat.S_IRWXU)
+        for file in files:
+            os.chmod(path.join(root, file), stat.S_IRWXU)
+    shutil.rmtree('./cloned_repo')
 
 # /packages
 @app.route('/packages', methods = ['POST'])
@@ -48,15 +107,27 @@ def add_package():
         url = request_content['URL']
     
     if content == 0:
-        # url
+        
+        #if url was set, clone it to current directory
+        Repo.clone_from(url, "cloned_repo")
 
-        package_name = 'get_package_name'
-        package_version = 'get_package_version'
-        package_url = 'get_package_url'
+        #then, call parse function for info we need
+        package_name, package_version, package_url = parse_for_info()
+
+        clean_up("cloned_repo")
+
         databaseFunctions.upload_package(package_name, package_version, None, package_url)
         pass
     else:
         #add content to database
+
+        #if encoded was set, decode it and unzip
+        convert(content)
+
+        #then, call parse function for info we need
+        name, version, url = parse_for_info()
+
+        clean_up("cloned_repo")
 
         package_name = 'get_package_name'
         package_version = 'get_package_version'
