@@ -3,17 +3,18 @@ import json
 
 def main():
 
-    example_body = '{"metadata": {"Name": "string","Version": "1.2.3","ID": "string"},"data": { "Content": "string","URL": "string","JSProgram": "string"}}'
-    example_json = json.loads(example_body)
+    #example_body = '{"metadata": {"Name": "string","Version": "1.2.3","ID": "string"},"data": { "Content": "string","URL": "string","JSProgram": "string"}}'
+    #example_body = '{ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "string" }'
+    #example_json = json.dumps(example_body)
 
-    print(example_json['metadata']['Name'])
+    
 
 
 
     try:
-        post_pkgs = requests.post('http://localhost:8080/packages')
+        post_pkgs = requests.post('http://localhost:8080/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "lodash" })
         print('post /packages content',post_pkgs.json())
-        print('post /packages status',post_pkgs.status_code)
+        #print('post /packages status',post_pkgs.status_code)
 
     except:
         print('post /packages failed')
@@ -21,6 +22,17 @@ def main():
     addSpace()
 
     try:
+        json_req = {
+        "URL": 'https://github.com/lodash/lodash',
+        "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+        }
+        post_pkg = requests.post('http://localhost:8080/package', json=json_req, verify=False)
+    except:
+        print('post package failed')
+
+    addSpace()
+
+    """ try:
         reset = requests.delete('http://localhost:8080/reset')
         print('delete /reset content',reset.json())
     except:
@@ -52,12 +64,7 @@ def main():
 
     addSpace()
 
-    try:
-        post_pkg = requests.post('http://localhost:8080/package')
-    except:
-        print('post package failed')
-
-    addSpace()
+    
 
     try:
         get_id_rate = requests.get('http://localhost:8080/package/lodash/rate')
@@ -86,7 +93,7 @@ def main():
         print('delete package/byName/<name> failed')
 
 
-    #post_pkg_byRegEx = requests.post('http://localhost:8080/package/byRegEx')
+    #post_pkg_byRegEx = requests.post('http://localhost:8080/package/byRegEx') """
 
 def addSpace():
     print('')

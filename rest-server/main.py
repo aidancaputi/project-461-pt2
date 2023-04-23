@@ -15,13 +15,37 @@ app = flask.Flask(__name__)
 
 # /packages
 @app.route('/packages', methods = ['POST'])
-def list_packages():
-    all_package_names = queryAllPackages()
-    str_resp = str(format(all_package_names))
-    response = flask.jsonify({'pkg':str_resp})
-    response.headers.add('Access-Control-Allow-Origin', '*')
+def search_packages():
 
-    return response
+    return_list = []
+    
+    #request has name and version
+    request_content = flask.request.get_json()
+    #print(request_content)
+    name = request_content['Name']
+    version = request_content['Version']
+
+    #get the exact version number
+    versions = version.split('\n')
+    exact_version = versions[0].split('(')[1]
+    exact_version = exact_version.split(')')[0]
+
+    #get json of all packages in database
+    packages_json = json.loads(databaseFunctions.get_all_packages())
+    #print(packages_json)
+
+    #go through the packages and return a match if there is one
+    for package in packages_json:
+
+        if((package['Version'] == exact_version) and (package['Name'] == name)):
+            
+            #format and return 
+            return_list.append(package)
+
+    #turn the list of packages into json and return it
+    return_json = json.dumps(return_list)
+
+    return return_json
 
 #takes a path to a folder and zips it, then encodes the zip into a base64 string
 def encode_repo(repo_path):
@@ -84,7 +108,7 @@ def parse_for_info(need_url):
     return name, version
 
 #delete the given directory
-def clean_up(cloned_dir):
+def clean_up(cloned_dir, was_encoding):
 
     #delete the cloned repo
     for root, dirs, files in os.walk("./cloned_repo"):  
@@ -94,7 +118,8 @@ def clean_up(cloned_dir):
             os.chmod(path.join(root, file), stat.S_IRWXU)
     shutil.rmtree('./cloned_repo')
 
-    os.rm("repo_zip.zip")
+    if(was_encoding == True):
+        os.remove("repo_zip.zip")
 
 # /package
 @app.route('/package', methods = ['POST'])
@@ -121,7 +146,11 @@ def add_package():
         #encode the cloned repo
         encoding = encode_repo("cloned_repo")
 
-        databaseFunctions.upload_package(package_name, package_version, encoding, url)
+        database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
+        
+        print(package_name, package_version, package_url, request_content['JSProgram'])
+
+        clean_up("cloned_repo", True)
     else:
         #ENCODING
 
@@ -131,11 +160,26 @@ def add_package():
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
 
-        databaseFunctions.upload_package(package_name, package_version, content, package_url)
+        package_info_list = [package_name, package_version, package_url]
 
-    clean_up("cloned_repo")
+        #if it didnt find one of the infos, return 400
+        for x in package_info_list:
+            if x == None:
+                clean_up("cloned_repo", False)
+                return '{}', 400
 
-    return "Package added!"
+        database_confirmation = databaseFunctions.upload_package(package_name, package_version, content, package_url, request_content['JSProgram'])
+        
+        print(package_name, package_version, package_url, request_content['JSProgram'])
+
+        clean_up("cloned_repo", False)
+
+    return_json = json.dumps(database_confirmation)
+
+    #print(return_json)
+    
+
+    return return_json
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate")
