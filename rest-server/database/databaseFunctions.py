@@ -10,8 +10,7 @@ def getconn():
             "ece-461-project-2-database:us-central1:ece-461-main-database", # Cloud SQL Instance Connection Name
             "pymysql",
             user="root",
-            #password=os.environ['DBPW'],
-            password="461isSUPERcool!",
+            password=os.environ['DBPW'],
             db="packages_database",
             timeout=60,
             ip_type=IPTypes.PUBLIC # public IP
