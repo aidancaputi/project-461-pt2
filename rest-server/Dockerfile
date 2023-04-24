@@ -19,6 +19,10 @@ COPY rest-server/ ./
 RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update && apt-get install -y git
 
+RUN pip install ndg-httpsclient
+RUN pip install pyopenssl
+RUN pip install pyasn1
+
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
 # For environments with multiple CPU cores, increase the number of workers
