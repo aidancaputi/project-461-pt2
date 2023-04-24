@@ -17,8 +17,7 @@ COPY rest-server/ ./
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && apt-get install -y git
-RUN pip install git
+RUN pip install gitpython
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
