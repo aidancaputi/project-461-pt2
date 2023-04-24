@@ -17,6 +17,7 @@ COPY rest-server/ ./
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y git
 RUN pip install git
 
 # Run the web service on container startup. Here we use the gunicorn
