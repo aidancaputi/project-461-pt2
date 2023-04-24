@@ -136,7 +136,10 @@ def add_package():
     
     if content == 0:
         #URL
-        
+        try:
+            clean_up("cloned_repo", True)
+        except:
+            print('cant rm')
         #clone the url
         Repo.clone_from(url, "cloned_repo")
 

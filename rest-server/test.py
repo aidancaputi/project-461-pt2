@@ -14,7 +14,7 @@ def main():
     try:
         post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "lodash" })
         print('post /packages content',post_pkgs.json())
-        #print('post /packages status',post_pkgs.status_code)
+        print('post /packages status',post_pkgs.content)
 
     except:
         print('post /packages failed')
@@ -27,6 +27,7 @@ def main():
         "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=json_req, verify=False)
+        print(post_pkg.content)
     except:
         print('post package failed')
 
