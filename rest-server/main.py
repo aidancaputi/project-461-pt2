@@ -10,6 +10,7 @@ import os
 import json
 from os import path
 import stat
+import requests
 
 app = flask.Flask(__name__)
 
@@ -110,6 +111,8 @@ def parse_for_info(need_url):
 #delete the given directory
 def clean_up(cloned_dir, was_encoding):
 
+    print("enter clean up")
+
     #delete the cloned repo
     for root, dirs, files in os.walk("./cloned_repo"):  
         for dir in dirs:
@@ -129,33 +132,9 @@ def add_package():
     content = 0
     url = 0
 
-    try:
+    #got content and not url
+    if ('Content' in request_content) and ('URL' not in request_content):
         content = request_content['Content']
-    except:
-        url = request_content['URL']
-    
-    if content == 0:
-        #URL
-        try:
-            clean_up("cloned_repo", True)
-        except:
-            print('cant rm')
-        #clone the url
-        Repo.clone_from(url, "cloned_repo")
-
-        #parse the local repo for the name and version
-        package_name, package_version = parse_for_info(need_url=False)
-
-        #encode the cloned repo
-        encoding = encode_repo("cloned_repo")
-
-        database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
-        
-        print(package_name, package_version, package_url, request_content['JSProgram'])
-
-        clean_up("cloned_repo", True)
-    else:
-        #ENCODING
 
         #if encoded was set, decode it and unzip
         convert_base64_and_unzip(content)
@@ -163,45 +142,87 @@ def add_package():
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
 
-        package_info_list = [package_name, package_version, package_url]
-
         #if it didnt find one of the infos, return 400
+        package_info_list = [package_name, package_version, package_url]
         for x in package_info_list:
             if x == None:
                 clean_up("cloned_repo", False)
                 return '{}', 400
 
+        #upload to database
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, content, package_url, request_content['JSProgram'])
+
+        #if it alreayd existed in database, clean and exit
+        if(database_confirmation == 409):
+            clean_up("cloned_repo", False)
+            return "Package already exists", 409
         
-        print(package_name, package_version, package_url, request_content['JSProgram'])
+        #print(package_name, package_version, package_url, request_content['JSProgram'])
 
         clean_up("cloned_repo", False)
 
-    return_json = json.dumps(database_confirmation)
+    #got url and not content
+    elif ('URL' in request_content) and ('Content' not in request_content):
+        url = request_content['URL']
+        
+        #clone the url
+        Repo.clone_from(url, "cloned_repo")
 
-    #print(return_json)
-    
+        #parse the local repo for the name and version
+        package_name, package_version = parse_for_info(need_url=False)
+
+        #if it didnt find one of the infos, return 400
+        package_info_list = [package_name, package_version, url]
+        for x in package_info_list:
+            if x == None:
+                clean_up("cloned_repo", True)
+                return '{}', 400
+
+        #encode the cloned repo
+        encoding = encode_repo("cloned_repo")
+
+        #upload to database
+        database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
+
+        #if it already existed, clean and exit
+        if(database_confirmation == 409):
+            clean_up("cloned_repo", True)
+            return "Package already exists", 409
+        
+        #print(package_name, package_version, package_url, request_content['JSProgram'])
+
+        clean_up("cloned_repo", True)
+
+    else: 
+
+        #this would be if both or neither field were set
+        return "Bad request", 400
+
+    return_json = json.dumps(database_confirmation)    
 
     return return_json
 
 # GET /package/{id}/rate
-@app.route("/package/<package_id>/rate")
-def get_metrics(package_name):
+@app.route("/package/<package_id>/rate", methods = ["GET"])
+def get_metrics(package_id):
 
-    #get URL using package ID
+    #get package info from database
+    db_resp = databaseFunctions.get_package(package_id)
+
+    #get url from content
+    url = db_resp['data']['URL']
 
     #use the URL to make request to pt1 server
+    response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
 
-    #format that response as the required json then return it
-
-    return
+    return response.content
 
 # /reset
 @app.route("/reset", methods = ['DELETE'])
 def reset(): 
-    #delete all stuff in database here --------------------------------------------------------
     databaseFunctions.reset_database()
-    return
+    response = flask.jsonify(success=True)
+    return response
 
 # PUT /package/{id}
 
