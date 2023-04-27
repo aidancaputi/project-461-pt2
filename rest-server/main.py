@@ -132,6 +132,11 @@ def add_package():
     content = 0
     url = 0
 
+    try:
+        clean_up("cloned_repo", True)
+    except:
+        pass
+
     #got content and not url
     if ('Content' in request_content) and ('URL' not in request_content):
         content = request_content['Content']
