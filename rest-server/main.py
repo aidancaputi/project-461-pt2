@@ -46,10 +46,14 @@ def search_packages():
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
 
+    print("packges found that match query: "+ str(return_list))
+
     return return_json
 
 #takes a path to a folder and zips it, then encodes the zip into a base64 string
 def encode_repo(repo_path):
+
+    print("enter encoding function")
     
     #zip the folder
     shutil.make_archive("repo_zip", 'zip', repo_path)
@@ -59,10 +63,13 @@ def encode_repo(repo_path):
         encoded = base64.b64encode(zipfile.read())
 
     #return the encoded zip file
+    print("package encoded successfully")
     return encoded
 
 #takes a base 64 encoding then decodes and unzips it
 def convert_base64_and_unzip(encoded):
+
+    print("decoding base64")
 
     #open a zip and write the decoded file to it
     with open('output_file.zip', 'wb') as result:
@@ -73,15 +80,23 @@ def convert_base64_and_unzip(encoded):
     zip_ref.extractall("cloned_repo") 
     zip_ref.close()
 
+    print("base64 decoded into directory")
+
 #finds the package.json file in a folder and returns the path
 def find_package_json(path):
+    print("finding package.json in local clone")
     filename = "package.json"
     for root, dirs, files in os.walk(path):
         if filename in files:
+            print("found package.json")
             return os.path.join(root, filename)
+    print("didnt find package.json")
+    return "fail to find package.json"
 
 #gets the metadata for the cloned repo
 def parse_for_info(need_url):
+    
+    print("enter parse for info")
 
     #find package.json in the cloned repo
     filepath = find_package_json("cloned_repo")
@@ -102,9 +117,10 @@ def parse_for_info(need_url):
             url = package_data['repository']['url']
         except:
             url = None
-
+        print("returning name, version, and url from parse for info")
         return name, version, url
     
+    print("returning name and version from parse for info")
     #if we didnt need the url, just return the name and version
     return name, version
 
@@ -128,6 +144,8 @@ def clean_up(cloned_dir, was_encoding):
 @app.route('/package', methods = ['POST'])
 def add_package():
     # add package to database here -------------------------------------------------
+    
+    print("enter post /package")
     request_content = flask.request.get_json()
     content = 0
     url = 0
@@ -139,6 +157,9 @@ def add_package():
 
     #got content and not url
     if ('Content' in request_content) and ('URL' not in request_content):
+
+        print("got content but not url")
+
         content = request_content['Content']
 
         #if encoded was set, decode it and unzip
@@ -152,14 +173,17 @@ def add_package():
         for x in package_info_list:
             if x == None:
                 clean_up("cloned_repo", False)
+                print("didnt find a necessary info on the repo, returning 400")
                 return '{}', 400
 
         #upload to database
+        print("calling upload_package")
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, content, package_url, request_content['JSProgram'])
 
         #if it alreayd existed in database, clean and exit
         if(database_confirmation == 409):
             clean_up("cloned_repo", False)
+            print("package already existed, returning 409")
             return "Package already exists", 409
         
         #print(package_name, package_version, package_url, request_content['JSProgram'])
@@ -168,10 +192,13 @@ def add_package():
 
     #got url and not content
     elif ('URL' in request_content) and ('Content' not in request_content):
+        
+        print("got url but not content")
         url = request_content['URL']
         
         #clone the url
         Repo.clone_from(url, "cloned_repo")
+        print("repo cloned")
 
         #parse the local repo for the name and version
         package_name, package_version = parse_for_info(need_url=False)
@@ -181,17 +208,20 @@ def add_package():
         for x in package_info_list:
             if x == None:
                 clean_up("cloned_repo", True)
+                print("didnt find a necessary info on the repo, returning 400")
                 return '{}', 400
 
         #encode the cloned repo
         encoding = encode_repo("cloned_repo")
 
         #upload to database
+        print("calling upload package")
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
 
         #if it already existed, clean and exit
         if(database_confirmation == 409):
             clean_up("cloned_repo", True)
+            print("package already existed, returning 409")
             return "Package already exists", 409
         
         #print(package_name, package_version, package_url, request_content['JSProgram'])
@@ -200,6 +230,7 @@ def add_package():
 
     else: 
 
+        print("both or neither content/url were set, bad requst 400")
         #this would be if both or neither field were set
         return "Bad request", 400
 
