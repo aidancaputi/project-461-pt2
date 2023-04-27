@@ -173,17 +173,23 @@ def upload_package(name, version, content, url, jsprogram):
         # search for package by content
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE Content = :content"), 
                                        parameters={"content": content})
+        print('search success 1')
         db_conn.commit()
+        print('commit success 1')
         for row in package_data:
             pool.dispose()
+            print('package content already existed')
             return 409 # package exists with same content
-        
+        print('package content didnt exist already')
         # search for package by URL
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE URL = :url"), 
                                        parameters={"url": url})
+        print('search success 2')
         db_conn.commit()
+        print('commit success 2')
         for row in package_data:
             pool.dispose()
+            print('package url already existed')
             return 409 # package exists with same URL
         
         # new package will be uploaded
