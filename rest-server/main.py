@@ -236,38 +236,55 @@ def add_package():
 
     return_json = json.dumps(database_confirmation)    
 
+    print("post /package success")
+
     return return_json
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
 def get_metrics(package_id):
 
+    print("enter get /rate for id: "+ str(package_id))
+
     #get package info from database
+    print("getting info on id from database")
     db_resp = databaseFunctions.get_package(package_id)
+    print("got info on id from database")
 
     #get url from content
     url = db_resp['data']['URL']
+    print("found url in the database response")
 
     #use the URL to make request to pt1 server
+    print("making request to pt1 server")
     response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
+    print("got response from pt1 server: "+ str(response.content))
 
     return response.content
 
 # /reset
 @app.route("/reset", methods = ['DELETE'])
 def reset(): 
+    print("delete /reset enter")
     databaseFunctions.reset_database()
+    print("database reset success")
     response = flask.jsonify(success=True)
+    print("responding 200 ok about delete reset")
     return response
 
 # PUT /package/{id}
-
 @app.route("/package/<id>", methods = ['PUT','GET','DELETE'])
 def put_by_id(id):
 
+    print("enter /package/id with method: " + str(flask.request.method))
+
     if flask.request.method == 'PUT':
+
+        print("it was put, getting request content")
         #get the request content json
         request_content = flask.request.get_json()
+
+        print("request content got succesfuly from request")
 
         #extract all the info from the request json
         put_id = request_content['metadata']['ID']
@@ -276,6 +293,8 @@ def put_by_id(id):
         put_content = request_content['data']['Content']
         put_URL = request_content['data']['URL']
         put_JSProgram = request_content['data']['JSProgram']
+
+        print("got all fields from request successfully")
 
         #use request info above to update database now
         
@@ -295,12 +314,12 @@ def put_by_id(id):
 
 def authenticate():
     # authenticate not implemented
-
+    print("authenticate called, returning 501")
     return "Not Implemented",501
 
 @app.route("/package/byName/<name>", methods = ['GET','DELETE'])
-
 def pkgbyName(name):
+    print("package byName entered with method: " + str(flask.request.method))
     if flask.request.method == 'GET':
         pass
         # query database using name variable
