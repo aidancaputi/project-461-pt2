@@ -36,9 +36,10 @@ def create_table():
             "(ID VARCHAR(255) NOT NULL, "
             "Name VARCHAR(255) NOT NULL, "
             "Version VARCHAR(255) NOT NULL, "
-            "Content MEDIUMTEXT NOT NULL, "
+            "Content LONGTEXT NOT NULL, "
             "URL VARCHAR(255), "
             "JSProgram MEDIUMTEXT NOT NULL, "
+            "ContentHash VARCHAR(255), "
             "PRIMARY KEY (id));"
             )
         )
@@ -132,11 +133,12 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
                                        parameters={"id_value": id})
         db_conn.commit()
 
-        # if package exists and matches update its content
+        # if package exists and matches update its content and hash
         for row in package_data:
             if row[1] == name and row[2] == version:
-                db_conn.execute(sqlalchemy.text("UPDATE packages SET Content = :new_content, URL = :new_URL, JSProgram = :new_JSProgram WHERE ID = :id"), 
-                                parameters={"new_content": new_content, "new_URL": new_url, "new_JSProgram": new_jsprogram, "id": id})
+                new_hash = hash(new_content) # calculate new hash
+                db_conn.execute(sqlalchemy.text("UPDATE packages SET Content = :new_content, URL = :new_URL, JSProgram = :new_JSProgram, ContentHash = :new_hash WHERE ID = :id"), 
+                                parameters={"new_content": new_content, "new_URL": new_url, "new_JSProgram": new_jsprogram, "new_hash": new_hash, "id": id})
                 db_conn.commit()
                 pool.dispose()
                 return 200
@@ -170,9 +172,12 @@ def upload_package(name, version, content, url, jsprogram):
     print('authenticated')
     with pool.connect() as db_conn:
         print('searching')
-        # search for package by content
-        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE Content like :content"), 
-                                       parameters={"content": content[:500] + '%'})
+         # calculate hash for each package based on its content
+        contentHash = hash(content)
+        
+        # search for package by content hash
+        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ContentHash = :contenthash"), 
+                                       parameters={"contenthash": contentHash})
         print('search success 1')
         db_conn.commit()
         print('commit success 1')
@@ -206,10 +211,10 @@ def upload_package(name, version, content, url, jsprogram):
 
         # insert data into table
         insert_stmt = sqlalchemy.text(
-            "INSERT INTO packages (ID, Name, Version, Content, URL, JSProgram) VALUES (:ID, :Name, :Version, :Content, :URL, :JSProgram)",)
+            "INSERT INTO packages (ID, Name, Version, Content, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :Content, :URL, :JSProgram, :ContentHash)",)
 
         # insert entries into table
-        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram})
+        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
 
@@ -249,10 +254,13 @@ def upload_package(name, version, content, url, jsprogram):
 
 '''
 reset_database()
-upload_package("NewPackage", "1.2.3", "testcontent", "testurl", "jsscript is super cool")
-upload_package("AidanCaputi", "1.2.4", "nourl", None, "this jsscript is useless")
-upload_package("Zane", "1.2.5", "zanecontent", "bothurl", "maybe this jssript does something")
+upload_package("NewPackage", "1.2.3", content, "testurl", "jsscript is super cool")
+upload_package("AidanCaputi", "1.2.4", content2, None, "this jsscript is useless")
+#upload_package("Zane", "1.2.5", content3, "bothurl", "maybe this jssript does something")
 
 result = get_package('zane0')
 print(result)
+
+upload_package("lodash", "1.2.5", content, None, "jsscript")
+print(get_all_packages())
 '''
