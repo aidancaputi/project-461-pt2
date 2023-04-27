@@ -167,7 +167,9 @@ def delete_package(id):
 # POST /package
 def upload_package(name, version, content, url, jsprogram):
     pool = authenticate()
+    print('authenticated')
     with pool.connect() as db_conn:
+        print('searching')
         # search for package by content
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE Content = :content"), 
                                        parameters={"content": content})
@@ -186,6 +188,7 @@ def upload_package(name, version, content, url, jsprogram):
         
         # new package will be uploaded
         # create new ID for package
+        print('uploading a new package')
         id, extranums = '', ''
         for x in range(len(name)):
             if (name[x].isupper()):
@@ -203,6 +206,8 @@ def upload_package(name, version, content, url, jsprogram):
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram})
         
         db_conn.commit() # commit transactions
+
+        print('finish up')
     pool.dispose() # dispose connection
 
     # build response JSON
@@ -233,6 +238,7 @@ def upload_package(name, version, content, url, jsprogram):
             }
         }
 
+    print('returning')
     return package
 
 '''

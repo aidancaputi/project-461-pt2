@@ -42,7 +42,7 @@ def main():
                 "password": "correcthorsebatterystaple123(!__+@**(A'\"`;DROP TABLE packages;"
             }
         }
-        put_authenticate = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/authenticate', json=put_authenticate_req)
+        put_authenticate = requests.put('https://localhost:8080/authenticate', json=put_authenticate_req)
         print('\nPUT_AUTHENTICATE RESPONSE CODE: ',str(put_authenticate.status_code),' ',str(put_authenticate.content),'\n')
         count += 1
     except:
@@ -57,7 +57,7 @@ def main():
             "URL": 'https://github.com/cloudinary/cloudinary_npm',
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
-        post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
+        post_pkg_url_resp = requests.post('https://localhost:8080/package', json=post_pkg_url)
         print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
         count += 1
     except:
@@ -79,7 +79,7 @@ def main():
                 "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
             }
         }
-        put_package_id_resp = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/package/id', json=put_package_id)
+        put_package_id_resp = requests.put('https://localhost:8080/package/id', json=put_package_id)
         print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
         
         count += 1
@@ -90,7 +90,7 @@ def main():
 
     #get /package/id
     try:
-        get_package_id_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd')
+        get_package_id_resp = requests.get('https://localhost:8080/package/tbd')
         print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
 
         count += 1
@@ -101,7 +101,7 @@ def main():
 
     #get /package/id/rate
     try:
-        get_package_id_rate_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd/rate')
+        get_package_id_rate_resp = requests.get('https://localhost:8080/package/tbd/rate')
         print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
 
         count += 1
@@ -116,7 +116,7 @@ def main():
             "Content": str(encoded_axios),
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
-        post_pkg_base64_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_base642)
+        post_pkg_base64_resp2 = requests.post('https://localhost:8080/package', json=post_pkg_base642)
         print('\nPOST PKG B64 AXIOS RESPONSE CODE: ',str(post_pkg_base64_resp2.status_code),' ',str(post_pkg_base64_resp2.content),'\n')
 
         count += 1
@@ -127,7 +127,7 @@ def main():
 
     #post /packages
     try:
-        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
+        post_pkgs = requests.post('https://localhost:8080/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
         count += 1
@@ -139,7 +139,7 @@ def main():
 
     #get /package/byname/name
     try:
-        get_package_name_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/axios')
+        get_package_name_resp = requests.get('https://localhost:8080/package/byName/axios')
         print('\nGET PKG BYNAME RESPONSE CODE: ',str(get_package_name_resp.status_code),' ',str(get_package_name_resp.content),'\n')
 
         count += 1
@@ -150,7 +150,7 @@ def main():
     
     #delete /package/byname/name
     try:
-        delete_package_name_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/cloudinary')
+        delete_package_name_resp = requests.delete('https://localhost:8080/package/byName/cloudinary')
         print('\nDEL PKG BYNAME RESPONSE CODE: ',str(delete_package_name_resp.status_code),' ',str(delete_package_name_resp.content),'\n')
 
         count += 1
@@ -161,7 +161,7 @@ def main():
 
     #delete /package/id
     try:
-        delete_package_id_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd')
+        delete_package_id_resp = requests.delete('https://localhost:8080/package/tbd')
         print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
 
         count += 1
@@ -176,7 +176,7 @@ def main():
             "URL": 'https://github.com/moleculerjs/moleculer',
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
-        post_pkg_url_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url2)
+        post_pkg_url_resp2 = requests.post('https://localhost:8080/package', json=post_pkg_url2)
         print('\nPOST PKG URL2 RESPONSE CODE: ',str(post_pkg_url_resp2.status_code),' ',str(post_pkg_url_resp2.content),'\n')
 
         count += 1
@@ -187,7 +187,7 @@ def main():
     
     #delete /reset
     try:
-        delete_reset_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/reset')
+        delete_reset_resp = requests.delete('https://localhost:8080/reset')
         print('\nDELETE RESET RESPONSE CODE: ',str(delete_reset_resp.status_code),' ',str(delete_reset_resp.content),'\n')
 
         count += 1
