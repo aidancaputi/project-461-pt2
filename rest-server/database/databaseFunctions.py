@@ -171,8 +171,8 @@ def upload_package(name, version, content, url, jsprogram):
     with pool.connect() as db_conn:
         print('searching')
         # search for package by content
-        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE Content = :content"), 
-                                       parameters={"content": content})
+        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE Content like :content"), 
+                                       parameters={"content": content[:500] + '%'})
         print('search success 1')
         db_conn.commit()
         print('commit success 1')
