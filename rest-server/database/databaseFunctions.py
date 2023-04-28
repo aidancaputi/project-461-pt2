@@ -100,10 +100,11 @@ def get_package(id):
     pool.dispose() # dispose connection
 
     package = {}
-    content_str = chopString(content)
+    
     for row in package_data:
         if row[3]: # URL
             content = read_blob(id)
+            content_str = chopString(content)
             package = {
                 'metadata': {
                     'Name': row[1],
@@ -118,6 +119,7 @@ def get_package(id):
             }
         else: # only content
             content = read_blob(id)
+            content_str = chopString(content)
             package = {
                 'metadata': {
                     'Name': row[1],

@@ -60,7 +60,7 @@ def main():
         }
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
 
-        post_pkg_url_resp_json = json.loads(post_pkg_url_resp.content)
+        post_pkg_url_resp_json = json.loads(len(str(post_pkg_url_resp.content['content'])))
         print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
         count += 1
         cloudinary_id = post_pkg_url_resp_json['metadata']['ID']
