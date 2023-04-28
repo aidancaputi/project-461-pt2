@@ -232,7 +232,7 @@ def upload_package(name, version, content, url, jsprogram):
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
-        write_blob(id, content)
+        write_blob(id, content.encode())
 
         print('finish up')
     pool.dispose() # dispose connection
