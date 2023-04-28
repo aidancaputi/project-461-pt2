@@ -210,9 +210,11 @@ def upload_package(name, version, content, url, jsprogram):
         id = id + extranums
 
         # insert data into table
+        print('about to insert data into table')
         insert_stmt = sqlalchemy.text(
             "INSERT INTO packages (ID, Name, Version, Content, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :Content, :URL, :JSProgram, :ContentHash)",)
 
+        print('inserted')
         # insert entries into table
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
