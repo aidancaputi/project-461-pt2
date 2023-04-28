@@ -293,27 +293,28 @@ def put_by_id(id):
 
     print("enter /package/id with method: " + str(flask.request.method))
 
+    #get the request content json
+    request_content = flask.request.get_json()
+
+    print("request content got succesfuly from request")
+
+    #extract all the info from the request json
+    try:
+        put_id = request_content['metadata']['ID']
+        put_name = request_content['metadata']['Name']
+        put_Version = request_content['metadata']['Version']
+        put_content = request_content['data']['Content']
+        put_URL = request_content['data']['URL']
+        put_JSProgram = request_content['data']['JSProgram']
+    except:
+        print("error reading fields from request")
+        return "Missing fields", 400
+
+    print("got all fields from request successfully")
+
     if flask.request.method == 'PUT':
 
         print("it was put, getting request content")
-        #get the request content json
-        request_content = flask.request.get_json()
-
-        print("request content got succesfuly from request")
-
-        #extract all the info from the request json
-        try:
-            put_id = request_content['metadata']['ID']
-            put_name = request_content['metadata']['Name']
-            put_Version = request_content['metadata']['Version']
-            put_content = request_content['data']['Content']
-            put_URL = request_content['data']['URL']
-            put_JSProgram = request_content['data']['JSProgram']
-        except:
-            print("error reading fields from request")
-            return "Missing fields", 400
-
-        print("got all fields from request successfully")
 
         #use request info above to update database now
         db_resp = databaseFunctions.update_package(put_name, put_Version, put_id, put_content, put_URL, put_JSProgram)
