@@ -248,10 +248,12 @@ def add_package():
         return "Bad request", 400
 
     return_json = json.dumps(database_confirmation)    
+    resp = flask.Response(return_json)
+    resp.headers['Transfer-Encoding'] = "chunked"
 
     print("post /package success")
 
-    return return_json
+    return resp
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
