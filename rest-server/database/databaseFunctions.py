@@ -100,6 +100,7 @@ def get_package(id):
     pool.dispose() # dispose connection
 
     package = {}
+    content_str = chopString(content)
     for row in package_data:
         if row[3]: # URL
             content = read_blob(id)
@@ -110,7 +111,7 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': str(content),
+                    'Content': content_str,
                     'URL': row[3],
                     'JSProgram': row[4]
                 }
@@ -124,7 +125,7 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': str(content),
+                    'Content': content_str,
                     'JSProgram': row[4]
                 }
             }
@@ -240,7 +241,7 @@ def upload_package(name, version, content, url, jsprogram):
 
     # build response JSON
     package = {}
-    content = read_blob(id)
+    content_str = chopString(content)
 
     if content and url: # both URL and content
         package = {
@@ -250,7 +251,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content),
+                'Content': content_str,
                 'URL': url,
                 'JSProgram': jsprogram
             }
@@ -263,7 +264,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content),
+                'Content': content_str,
                 'JSProrgam': jsprogram
             }
         }
@@ -271,6 +272,11 @@ def upload_package(name, version, content, url, jsprogram):
     print('returning')
     return package
 
+def chopString(data):
+    if len(data) > 32000000:
+        content_str = str(data[:3000000])
+
+    return content_str
 
 def create_bucket():
     # Instantiates a client
