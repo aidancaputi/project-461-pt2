@@ -3,7 +3,6 @@ import sqlalchemy
 import json
 import bucketFunctions
 import os
-
 # Python Connector database creator function
 def getconn():
     with Connector() as connector:
@@ -214,9 +213,11 @@ def upload_package(name, version, content, url, jsprogram):
         id = id + extranums
 
         # insert data into table
+        print('about to insert data into table')
         insert_stmt = sqlalchemy.text(
             "INSERT INTO packages (ID, Name, Version, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :URL, :JSProgram, :ContentHash)",)
 
+        print('inserted')
         # insert entries into table
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         

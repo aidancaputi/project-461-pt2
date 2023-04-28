@@ -14,6 +14,10 @@ import requests
 
 app = flask.Flask(__name__)
 
+@app.route('/', methods = ['GET'])
+def plain():
+    return 'Project homepage'
+
 # /packages
 @app.route('/packages', methods = ['POST'])
 def search_packages():
@@ -64,7 +68,9 @@ def encode_repo(repo_path):
 
     #return the encoded zip file
     print("package encoded successfully")
-    return encoded
+
+    # make sure the encoding is a string
+    return str(encoded)
 
 #takes a base 64 encoding then decodes and unzips it
 def convert_base64_and_unzip(encoded):
@@ -215,7 +221,7 @@ def add_package():
         encoding = encode_repo("cloned_repo")
 
         #upload to database
-        print("calling upload package with content: " + str(encoding)[:50])
+        print("calling upload package with content: " + encoding[:50])
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
 
         #if it already existed, clean and exit
