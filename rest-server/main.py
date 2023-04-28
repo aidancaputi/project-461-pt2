@@ -182,7 +182,7 @@ def add_package():
         content = request_content['Content']
 
         #if encoded was set, decode it and unzip
-        convert_base64_and_unzip(content)
+        convert_base64_and_unzip(bytes(content, 'utf-8'))
 
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
