@@ -79,10 +79,10 @@ def convert_base64_and_unzip(encoded):
 
     #open a zip and write the decoded file to it
     with open('output_file.zip', 'wb') as result:
-        result.write(base64.b64decode(bytes(encoded)))
+        result.write(base64.b64decode(encoded))
 
     #extract that file into folder with the name "cloned_repo"
-    zip_ref = zipfile.ZipFile("output_file.zip", "rb")
+    zip_ref = zipfile.ZipFile("output_file.zip", 'r')
     zip_ref.extractall("cloned_repo") 
     zip_ref.close()
 
