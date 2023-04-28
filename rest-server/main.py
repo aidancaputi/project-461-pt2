@@ -199,7 +199,7 @@ def add_package():
 
         #if it alreayd existed in database, clean and exit
         if(database_confirmation == 409):
-            clean_up("cloned_repo")
+            clean_up()
             print("package already existed, returning 409")
             return "Package already exists", 409
 
@@ -233,13 +233,13 @@ def add_package():
 
         #if it already existed, clean and exit
         if(database_confirmation == 409):
-            clean_up("cloned_repo", True)
+            clean_up()
             print("package already existed, returning 409")
             return "Package already exists", 409
         
         #print(package_name, package_version, package_url, request_content['JSProgram'])
 
-        clean_up("cloned_repo", True)
+        clean_up()
 
     else: 
 
