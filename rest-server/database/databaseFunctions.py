@@ -1,9 +1,12 @@
 from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import json
-import bucketFunctions
-import base64
 import os
+# Import the Google Cloud client library
+from google.cloud import storage
+import base64
+
+
 # Python Connector database creator function
 def getconn():
     with Connector() as connector:
@@ -79,8 +82,8 @@ def reset_database():
     pool.dispose() # dispose connection
 
     # reset content buckets
-    bucketFunctions.delete_bucket()
-    bucketFunctions.create_bucket()
+    delete_bucket()
+    create_bucket()
 
     create_table()
 
@@ -99,7 +102,7 @@ def get_package(id):
     package = {}
     for row in package_data:
         if row[4]: # URL
-            content = bucketFunctions.read_blob(id)
+            content = read_blob(id)
             package = {
                 'metadata': {
                     'Name': row[1],
@@ -113,7 +116,7 @@ def get_package(id):
                 }
             }
         else: # only content
-            content = bucketFunctions.read_blob(id)
+            content = read_blob(id)
             package = {
                 'metadata': {
                     'Name': row[1],
@@ -147,8 +150,8 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
                                 parameters={"new_URL": new_url, "new_JSProgram": new_jsprogram, "new_hash": new_hash, "id": id})
                 db_conn.commit()
                 # update content bucket
-                bucketFunctions.delete_blob(id)
-                bucketFunctions.write_blob(id)
+                delete_blob(id)
+                write_blob(id)
                 pool.dispose()
                 return 200
             
@@ -169,7 +172,7 @@ def delete_package(id):
             db_conn.execute(sqlalchemy.text("DELETE FROM packages WHERE ID = :id_value"), 
                                         parameters={"id_value": id})
             db_conn.commit()
-            bucketFunctions.delete_blob(id) # delete content
+            delete_blob(id) # delete content
             pool.dispose()
             return 200 # package is deleted
     pool.dispose() # dispose connection
@@ -229,7 +232,7 @@ def upload_package(name, version, content, url, jsprogram):
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
-        bucketFunctions.write_blob(id, content)
+        write_blob(id, content)
 
         print('finish up')
     pool.dispose() # dispose connection
@@ -264,6 +267,63 @@ def upload_package(name, version, content, url, jsprogram):
 
     print('returning')
     return package
+
+
+def create_bucket():
+    # Instantiates a client
+    storage_client = storage.Client()
+    # The name for the new bucket
+    bucket_name = "ece461bucket"
+    # Creates the new bucket
+    storage_client.create_bucket(bucket_name)
+
+def delete_bucket():
+    # Instantiates a client
+    storage_client = storage.Client()
+    # The name for the bucket to delete
+    blobs = storage_client.list_blobs('ece461bucket')
+    for blob in blobs:
+        blob.delete()
+    bucket = storage_client.get_bucket("ece461bucket")
+    # delete the bucket
+    bucket.delete(force=True)
+
+def write_blob(blob_name, content):
+    bucket_name = "ece461bucket"
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    with blob.open("wb") as f:
+        f.write(content)
+
+def read_blob(blob_name):
+    bucket_name = "ece461bucket"
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    with blob.open("rb") as f:
+        content = f.read()
+    
+    return content
+
+def delete_blob(blob_name):
+    bucket_name = "ece461bucket"
+
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+    generation_match_precondition = None
+
+    # set a generation-match precondition to avoid potential race conditions
+    # and data corruptions. The request to delete is aborted if the object's
+    # generation number does not match your precondition.
+    blob.reload()  # Fetch blob metadata to use in generation_match_precondition.
+    generation_match_precondition = blob.generation
+
+    blob.delete(if_generation_match=generation_match_precondition)
 
 '''
 with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
