@@ -110,7 +110,7 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': content,
+                    'Content': str(content),
                     'URL': row[3],
                     'JSProgram': row[4]
                 }
@@ -124,7 +124,7 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': content,
+                    'Content': str(content),
                     'JSProgram': row[4]
                 }
             }
