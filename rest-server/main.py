@@ -70,7 +70,7 @@ def encode_repo(repo_path):
     print("package encoded successfully")
 
     # make sure the encoding is a string
-    return str(encoded)
+    return encoded
 
 #takes a base 64 encoding then decodes and unzips it
 def convert_base64_and_unzip(encoded):

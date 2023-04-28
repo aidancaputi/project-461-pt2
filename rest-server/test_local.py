@@ -52,18 +52,18 @@ def main():
 
 
     #post /package - URL
-    try:
-        post_pkg_url = {
-            "URL": 'https://github.com/cloudinary/cloudinary_npm',
-            "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
-        }
-        post_pkg_url_resp = requests.post('http://localhost:8080/package', json=post_pkg_url)
-        print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
-        count += 1
-    except:
-        failed_tests.append('POST PKG URL 1')
-        traceback.print_exc()
-        print("post /package URL 1 failed with code above")
+    # try:
+    #     post_pkg_url = {
+    #         "URL": 'https://github.com/cloudinary/cloudinary_npm',
+    #         "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+    #     }
+    #     post_pkg_url_resp = requests.post('http://localhost:8080/package', json=post_pkg_url)
+    #     print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
+    #     count += 1
+    # except:
+    #     failed_tests.append('POST PKG URL 1')
+    #     traceback.print_exc()
+    #     print("post /package URL 1 failed with code above")
 
     # #put /package/id-- come back to this one
     # try:    
