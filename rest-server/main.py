@@ -11,6 +11,7 @@ import json
 from os import path
 import stat
 import requests
+from flask import Response
 
 app = flask.Flask(__name__)
 
@@ -247,13 +248,10 @@ def add_package():
         #this would be if both or neither field were set
         return "Bad request", 400
 
-    return_json = flask.jsonify(database_confirmation)
-    return_json.headers.add('Transfer-Encoding','chunked') 
+    def generate():
+        yield flask.jsonify(database_confirmation).encode('utf-8')
 
-    print("post /package success")
-    print('headers',return_json.headers)
-
-    return return_json
+    return Response(generate(), headers={'Transfer-Encoding': 'chunked'})
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
