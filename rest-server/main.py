@@ -79,10 +79,10 @@ def convert_base64_and_unzip(encoded):
 
     #open a zip and write the decoded file to it
     with open('output_file.zip', 'wb') as result:
-        result.write(base64.b64decode(encoded))
+        result.write(base64.b64decode(bytes(encoded)))
 
     #extract that file into folder with the name "cloned_repo"
-    zip_ref = zipfile.ZipFile("output_file.zip", 'r')
+    zip_ref = zipfile.ZipFile("output_file.zip", "rb")
     zip_ref.extractall("cloned_repo") 
     zip_ref.close()
 
@@ -182,7 +182,7 @@ def add_package():
         content = request_content['Content']
 
         #if encoded was set, decode it and unzip
-        convert_base64_and_unzip(bytes(content, 'utf-8'))
+        convert_base64_and_unzip(content)
 
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
