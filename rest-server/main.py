@@ -247,13 +247,12 @@ def add_package():
         #this would be if both or neither field were set
         return "Bad request", 400
 
-    return_json = json.dumps(database_confirmation)    
-    resp = flask.Response(return_json)
-    resp.headers['Transfer-Encoding'] = "chunked"
+    return_json = flask.jsonify(database_confirmation)
+    return_json.headers.add('Transfer-Encoding','chunked')    
 
     print("post /package success")
 
-    return resp
+    return return_json
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
