@@ -251,6 +251,7 @@ def add_package():
     return_json.headers.add('Transfer-Encoding','chunked')    
 
     print("post /package success")
+    print(return_json)
 
     return return_json
 
