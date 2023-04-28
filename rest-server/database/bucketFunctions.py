@@ -1,6 +1,7 @@
 # Import the Google Cloud client library
 from google.cloud import storage
 import base64
+from database import databaseFunctions
 
 def create_bucket():
     # Instantiates a client
@@ -57,3 +58,8 @@ def delete_blob(blob_name):
     generation_match_precondition = blob.generation
 
     blob.delete(if_generation_match=generation_match_precondition)
+
+delete_bucket()
+create_bucket()
+
+databaseFunctions.create_table()
