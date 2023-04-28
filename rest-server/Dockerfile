@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y git
 RUN pip install ndg-httpsclient
 RUN pip install pyopenssl
 RUN pip install pyasn1
+RUN pip install google-cloud-storage
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
