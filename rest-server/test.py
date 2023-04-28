@@ -60,6 +60,8 @@ def main():
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
         print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
         count += 1
+        cloudinary_id = post_pkg_url_resp.text['metadata']['ID']
+        cloudinary_ver = post_pkg_url_resp.text['metadata']['Version']
     except:
         failed_tests.append('POST PKG URL 1')
         traceback.print_exc()
@@ -70,18 +72,17 @@ def main():
         put_package_id = {
             "metadata": {
                 "Name": "cloudinary",
-                "Version": "1.2.3",
-                "ID": "cloudinary"
+                "Version": cloudinary_ver,
+                "ID": cloudinary_id
             },
             "data": {
                 "Content": str(encoded_cloudinary),
                 "URL": "https://github.com/cloudinary/cloudinary_npm",
-                "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+                "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success 2')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
             }
         }
         put_package_id_resp = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/package/cloudinary', json=put_package_id)
         print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
-        
         count += 1
     except:
         failed_tests.append('PUT PKG ID')
@@ -90,9 +91,8 @@ def main():
 
     #get /package/id
     try:
-        get_package_id_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd')
+        get_package_id_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
-
         count += 1
     except:
         failed_tests.append('GET PKG ID')
@@ -101,7 +101,7 @@ def main():
 
     #get /package/id/rate
     try:
-        get_package_id_rate_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd/rate')
+        get_package_id_rate_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}/rate')
         print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
 
         count += 1
@@ -127,7 +127,7 @@ def main():
 
     #post /packages
     try:
-        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
+        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": "Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
         count += 1
@@ -150,7 +150,7 @@ def main():
     
     #delete /package/byname/name
     try:
-        delete_package_name_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/cloudinary')
+        delete_package_name_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/axios')
         print('\nDEL PKG BYNAME RESPONSE CODE: ',str(delete_package_name_resp.status_code),' ',str(delete_package_name_resp.content),'\n')
 
         count += 1
@@ -161,7 +161,7 @@ def main():
 
     #delete /package/id
     try:
-        delete_package_id_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/tbd')
+        delete_package_id_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
 
         count += 1

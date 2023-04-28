@@ -248,7 +248,7 @@ def add_package():
         return "Bad request", 400
 
     return_json = flask.jsonify(database_confirmation)
-    return_json.headers.add('Transfer-Encoding','chunked')    
+    return_json.headers.add('Transfer-Encoding','chunked') 
 
     print("post /package success")
     print('headers',return_json.headers)
@@ -302,28 +302,50 @@ def put_by_id(id):
         print("request content got succesfuly from request")
 
         #extract all the info from the request json
-        put_id = request_content['metadata']['ID']
-        put_name = request_content['metadata']['Name']
-        put_Version = request_content['metadata']['Version']
-        put_content = request_content['data']['Content']
-        put_URL = request_content['data']['URL']
-        put_JSProgram = request_content['data']['JSProgram']
+        try:
+            put_id = request_content['metadata']['ID']
+            put_name = request_content['metadata']['Name']
+            put_Version = request_content['metadata']['Version']
+            put_content = request_content['data']['Content']
+            put_URL = request_content['data']['URL']
+            put_JSProgram = request_content['data']['JSProgram']
+        except:
+            print("error reading fields from request")
+            return "Missing fields", 400
 
         print("got all fields from request successfully")
 
         #use request info above to update database now
-        
-        return str(put_id) + " " + str(id)
+        db_resp = databaseFunctions.update_package(put_name, put_Version, put_id, put_content, put_URL, put_JSProgram)
+
+        print("update_package returned")
+
+        if(db_resp == 200):
+            return "OK", 200
+
+        return "Package does not exist", 404
     
     elif flask.request.method == 'GET':
         # send query to get <id> in variable id
+        db_resp = databaseFunctions.get_package(id)
 
-        return str(id)
+        if(db_resp == 404):
+            return "No package with that ID exists", 404
+        
+        return_json = flask.jsonify(db_resp)
+        return_json.headers.add('Transfer-Encoding','chunked') 
+
+        return return_json
     
     elif flask.request.method == 'DELETE':
         # send query to delete <id> in variable id
 
-        return str(id)
+        db_resp = databaseFunctions.delete_package(id)
+
+        if(db_resp == 404):
+            return "No package with that ID exists", 404
+        
+        return "Package deleted successfully", 200
 
 @app.route("/authenticate", methods = ['PUT'])
 
