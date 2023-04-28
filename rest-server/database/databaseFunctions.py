@@ -1,7 +1,7 @@
 from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import json
-import bucketFunctions
+from database import bucketFunctions
 import os
 # Python Connector database creator function
 def getconn():

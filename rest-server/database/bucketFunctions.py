@@ -1,7 +1,7 @@
 # Import the Google Cloud client library
 from google.cloud import storage
 import base64
-import databaseFunctions
+from database import databaseFunctions
 
 def create_bucket():
     # Instantiates a client
