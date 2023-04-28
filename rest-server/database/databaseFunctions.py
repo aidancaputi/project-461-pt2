@@ -101,7 +101,7 @@ def get_package(id):
 
     package = {}
     for row in package_data:
-        if row[4]: # URL
+        if row[3]: # URL
             content = read_blob(id)
             package = {
                 'metadata': {
@@ -111,8 +111,8 @@ def get_package(id):
                 },
                 'data': {
                     'Content': content,
-                    'URL': row[4],
-                    'JSProgram': row[5]
+                    'URL': row[3],
+                    'JSProgram': row[4]
                 }
             }
         else: # only content
@@ -125,7 +125,7 @@ def get_package(id):
                 },
                 'data': {
                     'Content': content,
-                    'JSProgram': row[5]
+                    'JSProgram': row[4]
                 }
             }
 

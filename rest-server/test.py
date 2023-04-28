@@ -58,10 +58,12 @@ def main():
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
+
+        post_pkg_url_resp_json = json.loads(post_pkg_url_resp.content)
         print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
         count += 1
-        cloudinary_id = post_pkg_url_resp.text['metadata']['ID']
-        cloudinary_ver = post_pkg_url_resp.text['metadata']['Version']
+        cloudinary_id = post_pkg_url_resp_json['metadata']['ID']
+        cloudinary_ver = post_pkg_url_resp_json['metadata']['Version']
     except:
         failed_tests.append('POST PKG URL 1')
         traceback.print_exc()
@@ -91,7 +93,7 @@ def main():
 
     #get /package/id
     try:
-        get_package_id_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
+        get_package_id_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
         count += 1
     except:
@@ -101,7 +103,7 @@ def main():
 
     #get /package/id/rate
     try:
-        get_package_id_rate_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}/rate')
+        get_package_id_rate_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}/rate')
         print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
 
         count += 1
@@ -161,7 +163,7 @@ def main():
 
     #delete /package/id
     try:
-        delete_package_id_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
+        delete_package_id_resp = requests.delete(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
 
         count += 1
