@@ -14,6 +14,10 @@ import requests
 
 app = flask.Flask(__name__)
 
+@app.route('/', methods = ['GET'])
+def plain():
+    return 'Project homepage'
+
 # /packages
 @app.route('/packages', methods = ['POST'])
 def search_packages():
