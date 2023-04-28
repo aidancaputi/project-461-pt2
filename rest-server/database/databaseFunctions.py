@@ -275,8 +275,12 @@ def upload_package(name, version, content, url, jsprogram):
 def chopString(data):
     if len(data) > 32000000:
         content_str = str(data[:3000000])
-
+        
+    else:
+        content_str =  str(data)
+    
     return content_str
+    
 
 def create_bucket():
     # Instantiates a client
