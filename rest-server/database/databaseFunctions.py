@@ -232,7 +232,8 @@ def upload_package(name, version, content, url, jsprogram):
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
-        write_blob(id, content.encode())
+        
+        write_blob(id, content)
 
         print('finish up')
     pool.dispose() # dispose connection
@@ -289,6 +290,10 @@ def delete_bucket():
     bucket.delete(force=True)
 
 def write_blob(blob_name, content):
+    try:
+        content = content.encode()
+    except:
+        pass
     bucket_name = "ece461bucket"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
