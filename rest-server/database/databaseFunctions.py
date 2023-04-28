@@ -217,7 +217,7 @@ def upload_package(name, version, content, url, jsprogram):
         print('inserted')
         # insert entries into table
         print(f'hash: {contentHash}')
-        content = 'a'
+        content = str(content)
         db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
