@@ -2,6 +2,7 @@ from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import json
 import bucketFunctions
+import base64
 import os
 # Python Connector database creator function
 def getconn():
@@ -97,7 +98,8 @@ def get_package(id):
 
     package = {}
     for row in package_data:
-        if row[3] and row[4]: # both URL and content
+        if row[4]: # URL
+            content = bucketFunctions.read_blob(id)
             package = {
                 'metadata': {
                     'Name': row[1],
@@ -105,12 +107,13 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': row[3],
+                    'Content': content,
                     'URL': row[4],
-                    'JSProgram': row[5],
+                    'JSProgram': row[5]
                 }
             }
         else: # only content
+            content = bucketFunctions.read_blob(id)
             package = {
                 'metadata': {
                     'Name': row[1],
@@ -118,8 +121,8 @@ def get_package(id):
                     'ID': row[0]
                 },
                 'data': {
-                    'Content': row[3],
-                    'JSProgram': row[5],
+                    'Content': content,
+                    'JSProgram': row[5]
                 }
             }
 
@@ -140,9 +143,12 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
         for row in package_data:
             if row[1] == name and row[2] == version:
                 new_hash = hash(new_content) # calculate new hash
-                db_conn.execute(sqlalchemy.text("UPDATE packages SET Content = :new_content, URL = :new_URL, JSProgram = :new_JSProgram, ContentHash = :new_hash WHERE ID = :id"), 
-                                parameters={"new_content": new_content, "new_URL": new_url, "new_JSProgram": new_jsprogram, "new_hash": new_hash, "id": id})
+                db_conn.execute(sqlalchemy.text("UPDATE packages SET URL = :new_URL, JSProgram = :new_JSProgram, ContentHash = :new_hash WHERE ID = :id"), 
+                                parameters={"new_URL": new_url, "new_JSProgram": new_jsprogram, "new_hash": new_hash, "id": id})
                 db_conn.commit()
+                # update content bucket
+                bucketFunctions.delete_blob(id)
+                bucketFunctions.write_blob(id)
                 pool.dispose()
                 return 200
             
@@ -163,6 +169,7 @@ def delete_package(id):
             db_conn.execute(sqlalchemy.text("DELETE FROM packages WHERE ID = :id_value"), 
                                         parameters={"id_value": id})
             db_conn.commit()
+            bucketFunctions.delete_blob(id) # delete content
             pool.dispose()
             return 200 # package is deleted
     pool.dispose() # dispose connection
@@ -239,7 +246,7 @@ def upload_package(name, version, content, url, jsprogram):
             'data': {
                 'Content': content,
                 'URL': id,
-                'JSProgram': jsprogram,
+                'JSProgram': jsprogram
             }
         }
     else: # only content
@@ -251,7 +258,7 @@ def upload_package(name, version, content, url, jsprogram):
             },
             'data': {
                 'Content': content,
-                'JSProrgam': jsprogram,
+                'JSProrgam': jsprogram
             }
         }
 
@@ -259,14 +266,19 @@ def upload_package(name, version, content, url, jsprogram):
     return package
 
 '''
+with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
+    encoded_cloudinary = base64.b64encode(file1.read())
+with open("test_zips/axios-1.x.zip", "rb") as file2:
+    encoded_axios = base64.b64encode(file2.read())
+
 reset_database()
-upload_package("NewPackage", "1.2.3", content, "testurl", "jsscript is super cool")
-upload_package("AidanCaputi", "1.2.4", content2, None, "this jsscript is useless")
+upload_package("NewPackage", "1.2.3", encoded_cloudinary, "testurl", "jsscript is super cool")
+upload_package("AidanCaputi", "1.2.4", encoded_axios, None, "this jsscript is useless")
 #upload_package("Zane", "1.2.5", content3, "bothurl", "maybe this jssript does something")
 
 result = get_package('zane0')
 print(result)
 
-upload_package("lodash", "1.2.5", content, None, "jsscript")
+upload_package("lodash", "1.2.5", encoded_cloudinary, None, "jsscript")
 print(get_all_packages())
 '''
