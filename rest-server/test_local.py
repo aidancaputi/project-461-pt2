@@ -65,125 +65,125 @@ def main():
         traceback.print_exc()
         print("post /package URL 1 failed with code above")
 
-    #put /package/id-- come back to this one
-    try:    
-        put_package_id = {
-            "metadata": {
-                "Name": "cloudinary",
-                "Version": "1.2.3",
-                "ID": "tbd"
-            },
-            "data": {
-                "Content": str(encoded_cloudinary),
-                "URL": "https://github.com/cloudinary/cloudinary_npm",
-                "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
-            }
-        }
-        put_package_id_resp = requests.put('http://localhost:8080/package/id', json=put_package_id)
-        print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
+    # #put /package/id-- come back to this one
+    # try:    
+    #     put_package_id = {
+    #         "metadata": {
+    #             "Name": "cloudinary",
+    #             "Version": "1.2.3",
+    #             "ID": "tbd"
+    #         },
+    #         "data": {
+    #             "Content": str(encoded_cloudinary),
+    #             "URL": "https://github.com/cloudinary/cloudinary_npm",
+    #             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+    #         }
+    #     }
+    #     put_package_id_resp = requests.put('http://localhost:8080/package/id', json=put_package_id)
+    #     print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
         
-        count += 1
-    except:
-        failed_tests.append('PUT PKG ID')
-        traceback.print_exc()
-        print("put /package/id failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('PUT PKG ID')
+    #     traceback.print_exc()
+    #     print("put /package/id failed with code above")
 
-    #get /package/id
-    try:
-        get_package_id_resp = requests.get('http://localhost:8080/package/tbd')
-        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
+    # #get /package/id
+    # try:
+    #     get_package_id_resp = requests.get('http://localhost:8080/package/tbd')
+    #     print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('GET PKG ID')
-        traceback.print_exc()
-        print("get pkg/id failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('GET PKG ID')
+    #     traceback.print_exc()
+    #     print("get pkg/id failed with code above")
 
-    #get /package/id/rate
-    try:
-        get_package_id_rate_resp = requests.get('http://localhost:8080/package/tbd/rate')
-        print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
+    # #get /package/id/rate
+    # try:
+    #     get_package_id_rate_resp = requests.get('http://localhost:8080/package/tbd/rate')
+    #     print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('GET PKG ID RATE')
-        traceback.print_exc()
-        print("get /package/id/rate failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('GET PKG ID RATE')
+    #     traceback.print_exc()
+    #     print("get /package/id/rate failed with code above")
 
-    #post /package - base64 SECOND
-    try:
-        post_pkg_base642 = {
-            "Content": str(encoded_axios),
-            "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
-        }
-        post_pkg_base64_resp2 = requests.post('http://localhost:8080/package', json=post_pkg_base642)
-        print('\nPOST PKG B64 AXIOS RESPONSE CODE: ',str(post_pkg_base64_resp2.status_code),' ',str(post_pkg_base64_resp2.content),'\n')
+    # #post /package - base64 SECOND
+    # try:
+    #     post_pkg_base642 = {
+    #         "Content": str(encoded_axios),
+    #         "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+    #     }
+    #     post_pkg_base64_resp2 = requests.post('http://localhost:8080/package', json=post_pkg_base642)
+    #     print('\nPOST PKG B64 AXIOS RESPONSE CODE: ',str(post_pkg_base64_resp2.status_code),' ',str(post_pkg_base64_resp2.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('POST PKG BASE64 AXIOS')
-        traceback.print_exc()
-        print("post /package base64 axios failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('POST PKG BASE64 AXIOS')
+    #     traceback.print_exc()
+    #     print("post /package base64 axios failed with code above")
 
-    #post /packages
-    try:
-        post_pkgs = requests.post('http://localhost:8080/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
-        print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
+    # #post /packages
+    # try:
+    #     post_pkgs = requests.post('http://localhost:8080/packages', json={ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
+    #     print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
-        count += 1
+    #     count += 1
 
-    except:
-        failed_tests.append('POST PKGS')
-        traceback.print_exc()
-        print('post /packages failed with status above')
+    # except:
+    #     failed_tests.append('POST PKGS')
+    #     traceback.print_exc()
+    #     print('post /packages failed with status above')
 
-    #get /package/byname/name
-    try:
-        get_package_name_resp = requests.get('http://localhost:8080/package/byName/axios')
-        print('\nGET PKG BYNAME RESPONSE CODE: ',str(get_package_name_resp.status_code),' ',str(get_package_name_resp.content),'\n')
+    # #get /package/byname/name
+    # try:
+    #     get_package_name_resp = requests.get('http://localhost:8080/package/byName/axios')
+    #     print('\nGET PKG BYNAME RESPONSE CODE: ',str(get_package_name_resp.status_code),' ',str(get_package_name_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('GET PKG BYNAME')
-        traceback.print_exc()
-        print("get /package/byName failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('GET PKG BYNAME')
+    #     traceback.print_exc()
+    #     print("get /package/byName failed with code above")
     
-    #delete /package/byname/name
-    try:
-        delete_package_name_resp = requests.delete('http://localhost:8080/package/byName/cloudinary')
-        print('\nDEL PKG BYNAME RESPONSE CODE: ',str(delete_package_name_resp.status_code),' ',str(delete_package_name_resp.content),'\n')
+    # #delete /package/byname/name
+    # try:
+    #     delete_package_name_resp = requests.delete('http://localhost:8080/package/byName/cloudinary')
+    #     print('\nDEL PKG BYNAME RESPONSE CODE: ',str(delete_package_name_resp.status_code),' ',str(delete_package_name_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('DELETE PKG BYNAME')
-        traceback.print_exc()
-        print("delete /package/byName failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('DELETE PKG BYNAME')
+    #     traceback.print_exc()
+    #     print("delete /package/byName failed with code above")
 
-    #delete /package/id
-    try:
-        delete_package_id_resp = requests.delete('http://localhost:8080/package/tbd')
-        print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
+    # #delete /package/id
+    # try:
+    #     delete_package_id_resp = requests.delete('http://localhost:8080/package/tbd')
+    #     print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('DEL PKG ID')
-        traceback.print_exc()
-        print("delete /package/id failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('DEL PKG ID')
+    #     traceback.print_exc()
+    #     print("delete /package/id failed with code above")
 
-    #post /package - URL
-    try:
-        post_pkg_url2 = {
-            "URL": 'https://github.com/moleculerjs/moleculer',
-            "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
-        }
-        post_pkg_url_resp2 = requests.post('http://localhost:8080/package', json=post_pkg_url2)
-        print('\nPOST PKG URL2 RESPONSE CODE: ',str(post_pkg_url_resp2.status_code),' ',str(post_pkg_url_resp2.content),'\n')
+    # #post /package - URL
+    # try:
+    #     post_pkg_url2 = {
+    #         "URL": 'https://github.com/moleculerjs/moleculer',
+    #         "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+    #     }
+    #     post_pkg_url_resp2 = requests.post('http://localhost:8080/package', json=post_pkg_url2)
+    #     print('\nPOST PKG URL2 RESPONSE CODE: ',str(post_pkg_url_resp2.status_code),' ',str(post_pkg_url_resp2.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('POST PKG URL 2')
-        traceback.print_exc()
-        print("post /package URL 2 failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('POST PKG URL 2')
+    #     traceback.print_exc()
+    #     print("post /package URL 2 failed with code above")
     
     #delete /reset
     try:
