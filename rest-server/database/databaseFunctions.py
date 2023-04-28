@@ -1,6 +1,7 @@
 from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import json
+import bucketFunctions
 import os
 
 # Python Connector database creator function
@@ -36,7 +37,6 @@ def create_table():
             "(ID VARCHAR(255) NOT NULL, "
             "Name VARCHAR(255) NOT NULL, "
             "Version VARCHAR(255) NOT NULL, "
-            "Content LONGTEXT NOT NULL, "
             "URL VARCHAR(255), "
             "JSProgram MEDIUMTEXT NOT NULL, "
             "ContentHash VARCHAR(255), "
@@ -77,6 +77,10 @@ def reset_database():
 
         db_conn.commit() # commit transaction 
     pool.dispose() # dispose connection
+
+    # reset content buckets
+    bucketFunctions.delete_bucket()
+    bucketFunctions.create_bucket()
 
     create_table()
 
@@ -211,12 +215,13 @@ def upload_package(name, version, content, url, jsprogram):
 
         # insert data into table
         insert_stmt = sqlalchemy.text(
-            "INSERT INTO packages (ID, Name, Version, Content, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :Content, :URL, :JSProgram, :ContentHash)",)
+            "INSERT INTO packages (ID, Name, Version, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :URL, :JSProgram, :ContentHash)",)
 
         # insert entries into table
-        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Content": content, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
+        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
+        bucketFunctions.write_blob(id, content)
 
         print('finish up')
     pool.dispose() # dispose connection
