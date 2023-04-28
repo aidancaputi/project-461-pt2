@@ -2,7 +2,6 @@ from google.cloud.sql.connector import Connector, IPTypes
 import sqlalchemy
 import json
 import os
-
 # Python Connector database creator function
 def getconn():
     with Connector() as connector:
@@ -36,7 +35,7 @@ def create_table():
             "(ID VARCHAR(255) NOT NULL, "
             "Name VARCHAR(255) NOT NULL, "
             "Version VARCHAR(255) NOT NULL, "
-            "Content VARCHAR(65535) NOT NULL, "
+            "Content VARCHAR(16383) NOT NULL, "
             "URL VARCHAR(255), "
             "JSProgram MEDIUMTEXT NOT NULL, "
             "ContentHash VARCHAR(255), "
