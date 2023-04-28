@@ -247,7 +247,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': content,
                 'URL': url,
                 'JSProgram': jsprogram
             }
@@ -260,7 +260,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': content,
                 'JSProrgam': jsprogram
             }
         }
