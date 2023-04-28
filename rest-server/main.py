@@ -11,6 +11,7 @@ import json
 from os import path
 import stat
 import requests
+from flask import Response
 
 app = flask.Flask(__name__)
 
@@ -182,7 +183,7 @@ def add_package():
         content = request_content['Content']
 
         #if encoded was set, decode it and unzip
-        convert_base64_and_unzip(content)
+        convert_base64_and_unzip(bytes(content, 'utf-8'))
 
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
@@ -247,13 +248,10 @@ def add_package():
         #this would be if both or neither field were set
         return "Bad request", 400
 
-    return_json = flask.jsonify(database_confirmation)
-    return_json.headers.add('Transfer-Encoding','chunked') 
+    def generate():
+        yield flask.jsonify(database_confirmation).encode('utf-8')
 
-    print("post /package success")
-    print('headers',return_json.headers)
-
-    return return_json
+    return Response(generate(), headers={'Transfer-Encoding': 'chunked'})
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
@@ -265,6 +263,9 @@ def get_metrics(package_id):
     print("getting info on id from database")
     db_resp = databaseFunctions.get_package(package_id)
     print("got info on id from database")
+
+    if(db_resp == 404):
+        return "No package with that ID exists", 404
 
     #get url from content
     url = db_resp['data']['URL']
@@ -293,27 +294,28 @@ def put_by_id(id):
 
     print("enter /package/id with method: " + str(flask.request.method))
 
+    #get the request content json
+    request_content = flask.request.get_json()
+
+    print("request content got succesfuly from request")
+
+    #extract all the info from the request json
+    try:
+        put_id = request_content['metadata']['ID']
+        put_name = request_content['metadata']['Name']
+        put_Version = request_content['metadata']['Version']
+        put_content = request_content['data']['Content']
+        put_URL = request_content['data']['URL']
+        put_JSProgram = request_content['data']['JSProgram']
+    except:
+        print("error reading fields from request")
+        return "Missing fields", 400
+
+    print("got all fields from request successfully")
+
     if flask.request.method == 'PUT':
 
         print("it was put, getting request content")
-        #get the request content json
-        request_content = flask.request.get_json()
-
-        print("request content got succesfuly from request")
-
-        #extract all the info from the request json
-        try:
-            put_id = request_content['metadata']['ID']
-            put_name = request_content['metadata']['Name']
-            put_Version = request_content['metadata']['Version']
-            put_content = request_content['data']['Content']
-            put_URL = request_content['data']['URL']
-            put_JSProgram = request_content['data']['JSProgram']
-        except:
-            print("error reading fields from request")
-            return "Missing fields", 400
-
-        print("got all fields from request successfully")
 
         #use request info above to update database now
         db_resp = databaseFunctions.update_package(put_name, put_Version, put_id, put_content, put_URL, put_JSProgram)
