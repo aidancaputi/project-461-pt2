@@ -71,7 +71,7 @@ def main():
             "metadata": {
                 "Name": "cloudinary",
                 "Version": "1.2.3",
-                "ID": "tbd"
+                "ID": "cloudinary"
             },
             "data": {
                 "Content": str(encoded_cloudinary),
@@ -79,7 +79,7 @@ def main():
                 "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
             }
         }
-        put_package_id_resp = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/package/id', json=put_package_id)
+        put_package_id_resp = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/package/cloudinary', json=put_package_id)
         print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
         
         count += 1
