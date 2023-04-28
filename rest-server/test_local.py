@@ -52,18 +52,18 @@ def main():
 
 
     #post /package - URL
-    # try:
-    #     post_pkg_url = {
-    #         "URL": 'https://github.com/cloudinary/cloudinary_npm',
-    #         "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
-    #     }
-    #     post_pkg_url_resp = requests.post('http://localhost:8080/package', json=post_pkg_url)
-    #     print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
-    #     count += 1
-    # except:
-    #     failed_tests.append('POST PKG URL 1')
-    #     traceback.print_exc()
-    #     print("post /package URL 1 failed with code above")
+    try:
+        post_pkg_url = {
+            "URL": 'https://github.com/cloudinary/cloudinary_npm',
+            "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+        }
+        post_pkg_url_resp = requests.post('http://localhost:8080/package', json=post_pkg_url)
+        print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
+        count += 1
+    except:
+        failed_tests.append('POST PKG URL 1')
+        traceback.print_exc()
+        print("post /package URL 1 failed with code above")
 
     # #put /package/id-- come back to this one
     # try:    
@@ -186,15 +186,15 @@ def main():
     #     print("post /package URL 2 failed with code above")
     
     #delete /reset
-    try:
-        delete_reset_resp = requests.delete('http://localhost:8080/reset')
-        print('\nDELETE RESET RESPONSE CODE: ',str(delete_reset_resp.status_code),' ',str(delete_reset_resp.content),'\n')
+    # try:
+    #     delete_reset_resp = requests.delete('http://localhost:8080/reset')
+    #     print('\nDELETE RESET RESPONSE CODE: ',str(delete_reset_resp.status_code),' ',str(delete_reset_resp.content),'\n')
 
-        count += 1
-    except:
-        failed_tests.append('DELETE RESET')
-        traceback.print_exc()
-        print("delete /reset failed with code above")
+    #     count += 1
+    # except:
+    #     failed_tests.append('DELETE RESET')
+    #     traceback.print_exc()
+    #     print("delete /reset failed with code above")
 
     print("passed: " + str(count) + " | failed: " + str(12 - count))
     print(f'score: {str(count)} / 12 -> {str(round(100*count/12,2))} %')
