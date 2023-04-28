@@ -151,7 +151,7 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
                 db_conn.commit()
                 # update content bucket
                 delete_blob(id)
-                write_blob(id)
+                write_blob(id, new_content)
                 pool.dispose()
                 return 200
             
@@ -248,7 +248,7 @@ def upload_package(name, version, content, url, jsprogram):
             },
             'data': {
                 'Content': str(content)[:500],
-                'URL': id,
+                'URL': url,
                 'JSProgram': jsprogram
             }
         }
