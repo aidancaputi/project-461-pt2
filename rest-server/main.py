@@ -228,7 +228,7 @@ def add_package():
         encoding = encode_repo("cloned_repo")
 
         #upload to database
-        print("calling upload_package with: " + package_name + " " + package_version + " " + package_url + " " + request_content['JSProgram'])
+        print("calling upload_package with: " + package_name + " " + package_version + " " + url + " " + request_content['JSProgram'])
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
 
         #if it already existed, clean and exit
