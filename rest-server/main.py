@@ -266,6 +266,9 @@ def get_metrics(package_id):
     db_resp = databaseFunctions.get_package(package_id)
     print("got info on id from database")
 
+    if(db_resp == 404):
+        return "No package with that ID exists", 404
+
     #get url from content
     url = db_resp['data']['URL']
     print("found url in the database response")
