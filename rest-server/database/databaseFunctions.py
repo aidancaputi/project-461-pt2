@@ -240,6 +240,8 @@ def upload_package(name, version, content, url, jsprogram):
 
     # build response JSON
     package = {}
+    content = read_blob(id)
+
     if content and url: # both URL and content
         package = {
             'metadata': {
@@ -248,7 +250,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': str(content),
                 'URL': url,
                 'JSProgram': jsprogram
             }
@@ -261,7 +263,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': str(content),
                 'JSProrgam': jsprogram
             }
         }
