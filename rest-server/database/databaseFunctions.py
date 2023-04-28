@@ -36,7 +36,7 @@ def create_table():
             "(ID VARCHAR(255) NOT NULL, "
             "Name VARCHAR(255) NOT NULL, "
             "Version VARCHAR(255) NOT NULL, "
-            "Content LONGTEXT NOT NULL, "
+            "Content VARCHAR(MAX) NOT NULL, "
             "URL VARCHAR(255), "
             "JSProgram MEDIUMTEXT NOT NULL, "
             "ContentHash VARCHAR(255), "
