@@ -413,12 +413,18 @@ def byRegEx():
     all_pkgs = databaseFunctions.get_all_packages()
     match_pkgs = []
 
+    print('all packages',all_pkgs)
+
     for p in all_pkgs:
+        print(p)
+        p = json.dumps(p)
         currID = p['Name']
         if re.match(reg,currID) is not None:
             p.pop('ID')
             temp = p
             match_pkgs.append(temp)
+    
+    print('matched packages',match_pkgs)
 
     return_json = flask.jsonify(match_pkgs)
     return_json.headers.add('Access-Control-Allow-Origin','*')

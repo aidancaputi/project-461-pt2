@@ -270,6 +270,21 @@ def main():
         traceback.print_exc()
         print("post /package URL 2 failed with code above")
     
+    #post regex
+    reg_json = {
+        "RegEx" : "*"
+    }
+
+    try:
+        reg_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package/byRegEx',json=reg_json)
+        print('\nREGEX RESET RESPONSE CODE: ',str(reg_resp.status_code),' ',str(reg_resp.content),'\n')
+
+        count += 1
+    except:
+        failed_tests.append('DELETE RESET')
+        traceback.print_exc()
+        print("delete /reset failed with code above")
+    
     #delete /reset
     try:
         delete_reset_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/reset')
