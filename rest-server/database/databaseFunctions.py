@@ -80,7 +80,7 @@ def get_all_packages():
         }
         packages.append(package)
 
-    return json.dumps(packages) # convert the list of dictionaries to JSON format and return it
+    return json.loads(packages) # convert the list of dictionaries to JSON format and return it
 
 # DELETE /reset
 def reset_database():

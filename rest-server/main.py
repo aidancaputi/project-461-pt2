@@ -417,7 +417,6 @@ def byRegEx():
 
     for p in all_pkgs:
         print(p)
-        p = json.dumps(p)
         currID = p['Name']
         if re.match(reg,currID) is not None:
             p.pop('ID')
