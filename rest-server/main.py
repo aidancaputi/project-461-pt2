@@ -410,7 +410,7 @@ def byRegEx():
     except:
         return 'improperly formatted request',400
     
-    all_pkgs = databaseFunctions.get_all_packages()
+    all_pkgs = json.loads(databaseFunctions.get_all_packages())
     match_pkgs = []
 
     print('all packages',all_pkgs)
