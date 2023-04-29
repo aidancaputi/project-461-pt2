@@ -1,11 +1,10 @@
 from google.cloud.sql.connector import Connector, IPTypes
+from google.cloud import storage
+from datetime import datetime
 import sqlalchemy
 import json
 import os
-# Import the Google Cloud client library
-from google.cloud import storage
 import base64
-from datetime import datetime
 
 # Python Connector database creator function
 def getconn():
@@ -14,9 +13,8 @@ def getconn():
             "ece-461-project-2-database:us-central1:ece-461-main-database", # Cloud SQL Instance Connection Name
             "pymysql",
             user="root",
-            #password=os.environ['DBPW'],
-            password='461isSUPERcool!',
-            db="packages_database",
+            password='461isSUPERcool!', # os.environ['DBPW']
+            db="packages_database", # database name
             timeout=60,
             ip_type=IPTypes.PUBLIC, # public IP
         )
@@ -30,11 +28,12 @@ def authenticate():
     )
     return pool
 
-# establish table format
+# establish table formats
 def create_table():
     pool = authenticate()
     with pool.connect() as db_conn:
         db_conn.execute(
+            # create packages table
             sqlalchemy.text(
             "CREATE TABLE IF NOT EXISTS packages "
             "(ID VARCHAR(255) NOT NULL, "
@@ -46,10 +45,9 @@ def create_table():
             "PRIMARY KEY (id));"
             )
         )
+        db_conn.commit()
 
-        db_conn.commit() # commit transaction 
-
-        # package history table
+        # create package history table
         db_conn.execute(
             sqlalchemy.text(
             "CREATE TABLE IF NOT EXISTS package_versions "
@@ -61,18 +59,16 @@ def create_table():
             "PRIMARY KEY (Date));"
             )
         )
-
-        db_conn.commit() # commit transaction 
-    pool.dispose() # dispose connection
+        db_conn.commit()
 
 
 # POST /packages
 def get_all_packages():
     pool = authenticate()
     with pool.connect() as db_conn:
-        # query and fetch data
+        # get all packages from packages table
         result = db_conn.execute(sqlalchemy.text('SELECT Version, Name, ID FROM packages')).fetchall()
-        db_conn.commit() # commit transaction 
+        db_conn.commit()
 
     # convert the results to a list of dictionaries
     packages = []
@@ -83,26 +79,22 @@ def get_all_packages():
             'ID': row[2]
         }
         packages.append(package)
-    pool.dispose() # dispose connection
+
     return json.dumps(packages) # convert the list of dictionaries to JSON format and return it
 
 # DELETE /reset
 def reset_database():
     pool = authenticate()
     with pool.connect() as db_conn:
-        # delete old database
-        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS packages'))
+        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS packages')) # delete old packages table
+        db_conn.commit()
+
+        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS package_versions')) # delete old package history table
         db_conn.commit() # commit transaction 
 
-        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS package_versions'))
-        db_conn.commit() # commit transaction 
-    pool.dispose() # dispose connection
-
-    # reset content buckets
-    delete_bucket()
-    create_bucket()
-
-    create_table()
+    delete_bucket() # delete old content bucket
+    create_bucket() # create new content bucket
+    create_table() # create new tables
 
     return 200
 
@@ -110,16 +102,16 @@ def reset_database():
 def get_package(id):
     pool = authenticate()
     with pool.connect() as db_conn:
-        # query and fetch data
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ID = :id_value"), 
-                                       parameters={"id_value": id})
+                                       parameters={"id_value": id}) # search for packages with matching ID
         db_conn.commit()
 
         package = {}
         for row in package_data:
-            if row[3]: # URL
-                content = read_blob(id)
-                content_str = chopString(content)
+            if row[3]: # URL and content
+                content = read_blob(id) # get content from bucket
+                content_str = chopString(content) # truncate content as needed
+                # build package JSON
                 package = {
                     'metadata': {
                         'Name': row[1],
@@ -153,8 +145,6 @@ def get_package(id):
             dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
             db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DOWNLOAD"})
             db_conn.commit() # commit transactions
-        
-        pool.dispose() # dispose connection
 
     if package == {}: # no package found
         return 404
@@ -164,12 +154,11 @@ def get_package(id):
 def update_package(name, version, id, new_content, new_url, new_jsprogram):
     pool = authenticate()
     with pool.connect() as db_conn:
-        # query and fetch data
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ID = :id_value"), 
-                                       parameters={"id_value": id})
+                                       parameters={"id_value": id}) # search for packages with matching ID
         db_conn.commit()
 
-        # if package exists and matches update its content and hash
+        # if package exists and matches name and version, update it
         for row in package_data:
             if row[1] == name and row[2] == version:
                 new_hash = hash(new_content) # calculate new hash
@@ -188,9 +177,8 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
                 db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Date": dateTime, "Action": "UPDATE"})
                 db_conn.commit()
                 pool.dispose()
+
                 return 200
-            
-    pool.dispose() # dispose connection
 
     return 404 # matching package not found
 
@@ -198,15 +186,13 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
 def delete_package(id):
     pool = authenticate()
     with pool.connect() as db_conn:
-        # search for package
         print("deleting package with id " + id)
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ID = :id_value"), 
-                                       parameters={"id_value": id})
+                                       parameters={"id_value": id}) # search for packages with matching ID
         db_conn.commit()
         for row in package_data:
-            # delete package
             db_conn.execute(sqlalchemy.text("DELETE FROM packages WHERE ID = :id_value"), 
-                                        parameters={"id_value": id})
+                                        parameters={"id_value": id}) # delete said matching package
             db_conn.commit()
 
             delete_blob(id) # delete content
@@ -216,75 +202,59 @@ def delete_package(id):
                 "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
             dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
             db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DELETE"})
-            
+            db_conn.commit()
             pool.dispose()
+            
             return 200 # package is deleted
-    pool.dispose() # dispose connection
 
     return 404 # matching package not found
 
 # POST /package
 def upload_package(name, version, content, url, jsprogram):
     pool = authenticate()
-    print('authenticated')
     with pool.connect() as db_conn:
-        print('searching')
-         # calculate hash for each package based on its content
-        contentHash = hash(content)
+        print('searching for exisiting package with same URL/content')
+        contentHash = hash(content) # calculate hash for each package based on its content
         
-        # search for package by content hash
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ContentHash = :contenthash"), 
-                                       parameters={"contenthash": contentHash})
-        print('search success 1')
+                                       parameters={"contenthash": contentHash}) # search for package by content hash
         db_conn.commit()
-        print('commit success 1')
+
         for row in package_data:
             pool.dispose()
             print('package content already existed')
             return 409 # package exists with same content
-        print('package content didnt exist already')
-        # search for package by URL
+        
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE URL = :url"), 
-                                       parameters={"url": url})
-        print('search success 2')
+                                       parameters={"url": url}) # search for package by URL
         db_conn.commit()
-        print('commit success 2')
+
         for row in package_data:
             pool.dispose()
             print('package url already existed')
             return 409 # package exists with same URL
         
-        # new package will be uploaded
-        # create new ID for package
+        # new package will be uploaded, create new ID for package
         print('uploading a new package')
         new_id = name + version
 
         # insert data into table
-        print('about to insert data into table')
         insert_stmt = sqlalchemy.text(
             "INSERT INTO packages (ID, Name, Version, URL, JSProgram, ContentHash) VALUES (:ID, :Name, :Version, :URL, :JSProgram, :ContentHash)",)
-
-        print('inserted')
-        # insert entries into table
         db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
-        
-        db_conn.commit() # commit transactions
-        write_blob(new_id, content)
+        db_conn.commit()
+        write_blob(new_id, content) # create new blob for content
 
         # update package version history with a new download entry
         insert_stmt = sqlalchemy.text(
             "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
         dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
         db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "Date": dateTime, "Action": "CREATE"})
-        db_conn.commit() # commit transactions
-
-        print('finish up')
-    pool.dispose() # dispose connection
+        db_conn.commit()
 
     # build response JSON
     package = {}
     content_str = chopString(content)
-
     if content and url: # both URL and content
         package = {
             'metadata': {
@@ -311,19 +281,17 @@ def upload_package(name, version, content, url, jsprogram):
             }
         }
 
-    print('returning')
     return package
 
 # GET /package/byName/{name}
 def get_package_history(name):
     pool = authenticate()
     with pool.connect() as db_conn:
-        # search for package version history
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM package_versions WHERE Name = :name_value"), 
-                                       parameters={"name_value": name})
+                                       parameters={"name_value": name}) # search for package version history
         db_conn.commit()
 
-        package_versions = []
+        package_versions = [] # build response with all package version histories
         for row in package_data:
             package = {
                 "Date": row[3],
@@ -334,11 +302,10 @@ def get_package_history(name):
                 },
                 "Action": row[4]
             }
-            package_versions.insert(0, package)
-    pool.dispose()
+            package_versions.insert(0, package) # insert at beginning of list
 
-    if package_versions == []: # no package found return 404
-        return 404
+    if package_versions == []:
+        return 404  # no package found return 404
     
     return json.dumps(package_versions) # convert the list of dictionaries to JSON format and return it
 
@@ -346,118 +313,83 @@ def get_package_history(name):
 def delete_history(name):
     pool = authenticate()
     with pool.connect() as db_conn:
-        # search for package version history
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM package_versions WHERE Name = :name_value"), 
-                                       parameters={"name_value": name})
+                                       parameters={"name_value": name}) # search for package version history
         db_conn.commit()
 
+        package_found = 0 # flag for if a package history is found
         for row in package_data:
-            print(row[0])
-            delete_package(row[0])
+            delete_package(row[0]) # delete package from database
 
-            # delete package
             db_conn.execute(sqlalchemy.text("DELETE FROM package_versions WHERE ID = :id_value"), 
-                                        parameters={"id_value": row[0]})
+                                        parameters={"id_value": row[0]}) # delete package
             db_conn.commit()
+            package_found = 1 # package history is found, set flag
         
-        if row in package_data:
+        if package_found:
             return 200 # package history is deleted
     
     pool.dispose()
     return 404 # package does not exist
 
+# function for truncating extra characters off of content, so as to not return content too big
 def chopString(data):
-    if len(data) > 32000000-100:
+    if len(data) > 32000000-100: # max of ~32 MB
         content_str = str(data[:3000000])
-        
     else:
         content_str =  str(data)
     
     return content_str
     
-
+# create a new bucket for content storage
 def create_bucket():
-    # Instantiates a client
-    storage_client = storage.Client()
-    # The name for the new bucket
-    bucket_name = "ece461bucket"
-    # Creates the new bucket
-    storage_client.create_bucket(bucket_name)
+    storage_client = storage.Client() # instantiates a client
+    storage_client.create_bucket("ece461bucket") # creates the new bucket
 
+# delete a bucket 
 def delete_bucket():
-    # Instantiates a client
-    storage_client = storage.Client()
-    # The name for the bucket to delete
-    blobs = storage_client.list_blobs('ece461bucket')
+    storage_client = storage.Client() # instantiates a client
+    blobs = storage_client.list_blobs("ece461bucket") # get list of all blobs
     for blob in blobs:
-        blob.delete()
-    bucket = storage_client.get_bucket("ece461bucket")
-    # delete the bucket
-    bucket.delete(force=True)
+        blob.delete() # delete each blob
+    bucket = storage_client.get_bucket("ece461bucket") # get the bucket itself
+    bucket.delete(force=True) # delete the bucket
 
+# create a new blob for a new package's content
 def write_blob(blob_name, content):
-    try:
+    try: # encode the content if possible
         content = content.encode()
     except:
         pass
-    bucket_name = "ece461bucket"
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+    storage_client = storage.Client() # instantiates a client
+    bucket = storage_client.bucket("ece461bucket")
     blob = bucket.blob(blob_name)
 
     with blob.open("wb") as f:
-        f.write(content)
+        f.write(content) # write content to the blob
 
+# read content from a blob
 def read_blob(blob_name):
-    bucket_name = "ece461bucket"
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+    storage_client = storage.Client() # instantiates a client
+    bucket = storage_client.bucket("ece461bucket")
     blob = bucket.blob(blob_name)
 
     with blob.open("rb") as f:
-        content = f.read()
+        content = f.read() # read content from the blob
     
     return content
 
+# delete a blob and its content
 def delete_blob(blob_name):
-    bucket_name = "ece461bucket"
-
-    storage_client = storage.Client()
-
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(blob_name)
+    storage_client = storage.Client() # instantiates a client
+    bucket = storage_client.bucket("ece461bucket")
+    blob = bucket.blob(blob_name) 
     generation_match_precondition = None
 
     # set a generation-match precondition to avoid potential race conditions
     # and data corruptions. The request to delete is aborted if the object's
-    # generation number does not match your precondition.
-    blob.reload()  # Fetch blob metadata to use in generation_match_precondition.
+    # generation number does not match the precondition
+    blob.reload()  # fetch blob metadata to use in generation_match_precondition.
     generation_match_precondition = blob.generation
 
-    blob.delete(if_generation_match=generation_match_precondition)
-
-
-""" with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
-    encoded_cloudinary = base64.b64encode(file1.read())
-with open("test_zips/axios-1.x.zip", "rb") as file2:
-    encoded_axios = base64.b64encode(file2.read())
-with open("test_zips/zip-master.zip", "rb") as file3:
-    encoded_zip = base64.b64encode(file3.read()) """
-
-'''
-reset_database()
-upload_package("NewPackage", "1.2.3", encoded_cloudinary, "testurl", "jsscript is super cool")
-upload_package("AidanCaputi", "1.2.4", encoded_axios, None, "this jsscript is useless")
-
-update_package("NewPackage", "1.2.3", "NewPackage1.2.3", encoded_cloudinary, None, "jsscript")
-get_package("NewPackage1.2.3")
-print(get_all_packages())
-print(get_package_history("NewPackage"))
-
-upload_package("NewPackage", "2.0.0", encoded_zip, None, "amazing jsscript")
-print(get_all_packages())
-print(get_package_history("NewPackage"))
-print(delete_history("NewPackage"))
-print(get_all_packages())
-print(get_package_history("NewPackage"))
-'''
+    blob.delete(if_generation_match=generation_match_precondition) # delete blob
