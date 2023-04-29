@@ -20,14 +20,16 @@ pub mod rate_repos {
         }
 
         #[derive(Serialize, Deserialize, Debug)]
-        #[serde(rename_all = "UPPERCASE")]
+        //#[serde(rename_all = "UPPERCASE")]
         pub struct MetricScores {
-            pub net_score: f32,
-            pub ramp_up_score: i32,
-            pub correctness_score: f32,
-            pub bus_factor_score: f32,
-            pub responsive_maintainer_score: f32,
-            pub license_score: i32,
+            pub BusFactor: f32,
+            pub Correctness: f32,
+            pub RampUp: i32,
+            pub ResponsiveMaintainer: f32,
+            pub LicenseScore: i32,
+            pub GoodPinningPractice: i32,
+            pub PullRequest: i32,
+            pub NetScore: f32,
         }
 
         const BUS_FACTOR_WEIGHT: f32 = 0.3;
@@ -39,34 +41,36 @@ pub mod rate_repos {
         pub async fn get_metrics(_url: &str) -> MetricScores {
             // each of these 0.5's will be a call each metric function in their file
             let mut scores = MetricScores {
-                net_score: 0.0,
-                ramp_up_score: -1,
-                bus_factor_score: bus_factor_score(_url).await,
-                correctness_score: calculate_correctness(_url).await as f32,
-                responsive_maintainer_score: responsive_maintainer_score(_url).await,
-                license_score: -1,
+                BusFactor: bus_factor_score(_url).await,
+                Correctness: calculate_correctness(_url).await as f32,
+                RampUp: -1,
+                ResponsiveMaintainer: responsive_maintainer_score(_url).await,
+                LicenseScore: -1,
+                GoodPinningPractice: -1,
+                PullRequest: -1,
+                NetScore: 0.0,
             };
 
-            scores.net_score = scores.bus_factor_score * BUS_FACTOR_WEIGHT
-                + scores.correctness_score * CORRECTNESS_WEIGHT
-                + (scores.license_score * LICENSE_WEIGHT) as f32
-                + scores.responsive_maintainer_score * RESPONSIVE_MAINTAINER_WEIGHT
-                + (scores.ramp_up_score * RAMP_UP_WEIGHT) as f32;
+            scores.NetScore = scores.BusFactor * BUS_FACTOR_WEIGHT
+                + scores.Correctness * CORRECTNESS_WEIGHT
+                + (scores.LicenseScore * LICENSE_WEIGHT) as f32
+                + scores.ResponsiveMaintainer * RESPONSIVE_MAINTAINER_WEIGHT
+                + (scores.RampUp * RAMP_UP_WEIGHT) as f32;
 
             // round each score
-            scores.net_score = round_to_3(scores.net_score);
-            scores.correctness_score = round_to_3(scores.correctness_score);
-            scores.bus_factor_score = round_to_3(scores.bus_factor_score);
-            scores.responsive_maintainer_score = round_to_3(scores.responsive_maintainer_score);
+            scores.NetScore = round_to_3(scores.NetScore);
+            scores.Correctness = round_to_3(scores.Correctness);
+            scores.BusFactor = round_to_3(scores.BusFactor);
+            scores.ResponsiveMaintainer = round_to_3(scores.ResponsiveMaintainer);
 
             return scores;
         }
     }
 
     #[derive(Serialize, Deserialize, Debug)]
-    #[serde(rename_all = "UPPERCASE")]
+    //#[serde(rename_all = "UPPERCASE")]
     pub struct UrlSpecs {
-        pub url: String,
+        //pub url: String,
         #[serde(flatten)]
         pub metric_scores: metrics::MetricScores,
     }
@@ -112,7 +116,7 @@ pub mod rate_repos {
                 if &github_url[0..19] == "https://github.com/" {
                     // if validate_github_url(&github_url).unwrap() {
                         let url_spec = UrlSpecs {
-                            url: url.to_string(),
+                            //url: url.to_string(),
                             metric_scores: metrics::get_metrics(&github_url).await,
                         };
                         url_specs.push(url_spec);
@@ -121,21 +125,23 @@ pub mod rate_repos {
             else if &url[0..19] == "https://github.com/" {
                 // /if validate_github_url(&url).unwrap() {
                     let url_spec = UrlSpecs {
-                        url: url.to_string(),
+                        //url: url.to_string(),
                         metric_scores: metrics::get_metrics(&url).await,
                     };
                     url_specs.push(url_spec);
             }
             else {
                 let url_spec = UrlSpecs {
-                    url: url.to_string(),
+                    //url: url.to_string(),
                     metric_scores: metrics::MetricScores {
-                        net_score: 0.0,
-                        ramp_up_score: -1,
-                        correctness_score: 0.0,
-                        bus_factor_score: 0.0,
-                        responsive_maintainer_score: 0.0,
-                        license_score: -1,
+                        BusFactor: 0.0,
+                        Correctness: 0.0,
+                        RampUp: -1,
+                        ResponsiveMaintainer: 0.0,
+                        LicenseScore: -1,
+                        GoodPinningPractice: -1,
+                        PullRequest: -1,
+                        NetScore: 0.0,
                     },
                 };
                 url_specs.push(url_spec);
@@ -146,8 +152,8 @@ pub mod rate_repos {
         simple_log::info!("Sorting repos in decreasing order.");
         url_specs.sort_by(|a, b| {
             b.metric_scores
-                .net_score
-                .partial_cmp(&a.metric_scores.net_score)
+                .NetScore
+                .partial_cmp(&a.metric_scores.NetScore)
                 .unwrap()
         });
 
@@ -201,12 +207,14 @@ mod tests {
             rate_repos::UrlSpecs {
                 url: "fake_url_1".to_string(),
                 metric_scores: rate_repos::metrics::MetricScores {
-                    net_score: 0.5,
-                    ramp_up_score: -1,
-                    correctness_score: 0.5,
-                    bus_factor_score: 0.5,
-                    responsive_maintainer_score: 0.5,
-                    license_score: -1,
+                    BusFactor: 0.5,
+                    Correctness: 0.5,
+                    RampUp: -1,
+                    ResponsiveMaintainer: 0.5,
+                    LicenseScore: -1,
+                    GoodPinningPractice: -1,
+                    PullRequest: -1,
+                    NetScore: 0.5,
                 },
             }
         );
@@ -215,12 +223,14 @@ mod tests {
             rate_repos::UrlSpecs {
                 url: "fake_url_2".to_string(),
                 metric_scores: rate_repos::metrics::MetricScores {
-                    net_score: 0.7,
-                    ramp_up_score: -1,
-                    correctness_score: 0.5,
-                    bus_factor_score: 0.5,
-                    responsive_maintainer_score: 0.5,
-                    license_score: -1,
+                    BusFactor: 0.5,
+                    Correctness: 0.5,
+                    RampUp: -1,                    
+                    ResponsiveMaintainer: 0.5,
+                    LicenseScore: -1,
+                    GoodPinningPractice: -1,
+                    PullRequest: -1,
+                    NetScore: 0.7,
                 },
             }
         );
