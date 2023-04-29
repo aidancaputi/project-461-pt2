@@ -361,13 +361,24 @@ def authenticate():
 def pkgbyName(name):
     print("package byName entered with method: " + str(flask.request.method))
     if flask.request.method == 'GET':
-        pass
-        # query database using name variable
+        
+        resp = databaseFunctions.get_package_history(name)
+
+        if resp == 404:
+            return 'no package found',404
+        
+        return resp
+        
+    # query database using name variable
     elif flask.request.method == 'DELETE':
-        pass
         # delete name from database
-    
-    return
+
+        resp = databaseFunctions.delete_history(name)
+
+        if resp == 404:
+            return 'no package found',404
+        
+        return 'package deleted successfully'
 
 # @app.route("/package/byRegEx", methods = ['POST'])
 # def byRegEx():

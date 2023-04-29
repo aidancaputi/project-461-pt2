@@ -367,7 +367,7 @@ def delete_history(name):
     return 404 # package does not exist
 
 def chopString(data):
-    if len(data) > 32000000:
+    if len(data) > 32000000-100:
         content_str = str(data[:3000000])
         
     else:
