@@ -5,7 +5,7 @@ import os
 # Import the Google Cloud client library
 from google.cloud import storage
 import base64
-
+from datetime import datetime
 
 # Python Connector database creator function
 def getconn():
@@ -48,6 +48,21 @@ def create_table():
         )
 
         db_conn.commit() # commit transaction 
+
+        # package history table
+        db_conn.execute(
+            sqlalchemy.text(
+            "CREATE TABLE IF NOT EXISTS package_versions "
+            "(ID VARCHAR(255) NOT NULL, "
+            "Name VARCHAR(255) NOT NULL, "
+            "Version VARCHAR(255) NOT NULL, "
+            "Date VARCHAR(255) NOT NULL, "
+            "Action VARCHAR(255) NOT NULL, "
+            "PRIMARY KEY (Date));"
+            )
+        )
+
+        db_conn.commit() # commit transaction 
     pool.dispose() # dispose connection
 
 
@@ -77,7 +92,9 @@ def reset_database():
     with pool.connect() as db_conn:
         # delete old database
         db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS packages'))
+        db_conn.commit() # commit transaction 
 
+        db_conn.execute(sqlalchemy.text('DROP TABLE IF EXISTS package_versions'))
         db_conn.commit() # commit transaction 
     pool.dispose() # dispose connection
 
@@ -97,37 +114,45 @@ def get_package(id):
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ID = :id_value"), 
                                        parameters={"id_value": id})
         db_conn.commit()
-    pool.dispose() # dispose connection
 
-    package = {}
-    for row in package_data:
-        if row[3]: # URL
-            content = read_blob(id)
-            package = {
-                'metadata': {
-                    'Name': row[1],
-                    'Version': row[2],
-                    'ID': row[0]
-                },
-                'data': {
-                    'Content': content,
-                    'URL': row[3],
-                    'JSProgram': row[4]
+        package = {}
+        for row in package_data:
+            if row[3]: # URL
+                content = read_blob(id)
+                package = {
+                    'metadata': {
+                        'Name': row[1],
+                        'Version': row[2],
+                        'ID': row[0]
+                    },
+                    'data': {
+                        'Content': content,
+                        'URL': row[3],
+                        'JSProgram': row[4]
+                    }
                 }
-            }
-        else: # only content
-            content = read_blob(id)
-            package = {
-                'metadata': {
-                    'Name': row[1],
-                    'Version': row[2],
-                    'ID': row[0]
-                },
-                'data': {
-                    'Content': content,
-                    'JSProgram': row[4]
+            else: # only content
+                content = read_blob(id)
+                package = {
+                    'metadata': {
+                        'Name': row[1],
+                        'Version': row[2],
+                        'ID': row[0]
+                    },
+                    'data': {
+                        'Content': content,
+                        'JSProgram': row[4]
+                    }
                 }
-            }
+            
+            # update package version history with a new download entry
+            insert_stmt = sqlalchemy.text(
+                "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+            dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
+            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DOWNLOAD"})
+            db_conn.commit() # commit transactions
+        
+        pool.dispose() # dispose connection
 
     if package == {}: # no package found
         return 404
@@ -149,9 +174,17 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
                 db_conn.execute(sqlalchemy.text("UPDATE packages SET URL = :new_URL, JSProgram = :new_JSProgram, ContentHash = :new_hash WHERE ID = :id"), 
                                 parameters={"new_URL": new_url, "new_JSProgram": new_jsprogram, "new_hash": new_hash, "id": id})
                 db_conn.commit()
+
                 # update content bucket
                 delete_blob(id)
                 write_blob(id, new_content)
+
+                # update package version history with a new download entry
+                insert_stmt = sqlalchemy.text(
+                    "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+                dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
+                db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Date": dateTime, "Action": "UPDATE"})
+                db_conn.commit()
                 pool.dispose()
                 return 200
             
@@ -172,7 +205,15 @@ def delete_package(id):
             db_conn.execute(sqlalchemy.text("DELETE FROM packages WHERE ID = :id_value"), 
                                         parameters={"id_value": id})
             db_conn.commit()
+
             delete_blob(id) # delete content
+
+            # update package version history with a new download entry
+            insert_stmt = sqlalchemy.text(
+                "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+            dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
+            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DELETE"})
+            
             pool.dispose()
             return 200 # package is deleted
     pool.dispose() # dispose connection
@@ -213,14 +254,7 @@ def upload_package(name, version, content, url, jsprogram):
         # new package will be uploaded
         # create new ID for package
         print('uploading a new package')
-        id, extranums = '', ''
-        for x in range(len(name)):
-            if (name[x].isupper()):
-                extranums = extranums + str(x)
-                id = id + name[x].lower()
-            else:
-                id = id + name[x]
-        id = id + extranums
+        new_id = name + version
 
         # insert data into table
         print('about to insert data into table')
@@ -229,10 +263,17 @@ def upload_package(name, version, content, url, jsprogram):
 
         print('inserted')
         # insert entries into table
-        db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
+        db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "URL": url, "JSProgram": jsprogram, "ContentHash": contentHash})
         
         db_conn.commit() # commit transactions
-        write_blob(id, content)
+        write_blob(new_id, content)
+
+        # update package version history with a new download entry
+        insert_stmt = sqlalchemy.text(
+            "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+        dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
+        db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "Date": dateTime, "Action": "CREATE"})
+        db_conn.commit() # commit transactions
 
         print('finish up')
     pool.dispose() # dispose connection
@@ -244,7 +285,7 @@ def upload_package(name, version, content, url, jsprogram):
             'metadata': {
                 'Name': name,
                 'Version': version,
-                'ID': id
+                'ID': new_id
             },
             'data': {
                 'Content': str(content)[:500],
@@ -257,7 +298,7 @@ def upload_package(name, version, content, url, jsprogram):
             'metadata': {
                 'Name': name,
                 'Version': version,
-                'ID': id
+                'ID': new_id
             },
             'data': {
                 'Content': str(content)[:500],
@@ -267,6 +308,34 @@ def upload_package(name, version, content, url, jsprogram):
 
     print('returning')
     return package
+
+# GET /package/byName/{name}
+def get_package_history(name):
+    pool = authenticate()
+    with pool.connect() as db_conn:
+        # search for package version history
+        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM package_versions WHERE Name = :name_value"), 
+                                       parameters={"name_value": name})
+        db_conn.commit()
+
+        package_versions = []
+        for row in package_data:
+            package = {
+                "Date": row[3],
+                "PackageMetadata": {
+                    "Name": row[1],
+                    "Version": row[2],
+                    "ID": row[0]
+                },
+                "Action": row[4]
+            }
+            package_versions.insert(0, package)
+    pool.dispose()
+
+    if package_versions == []: # no package found return 404
+        return 404
+    
+    return json.dumps(package_versions) # convert the list of dictionaries to JSON format and return it
 
 
 def create_bucket():
@@ -334,11 +403,9 @@ with open("test_zips/axios-1.x.zip", "rb") as file2:
 reset_database()
 upload_package("NewPackage", "1.2.3", encoded_cloudinary, "testurl", "jsscript is super cool")
 upload_package("AidanCaputi", "1.2.4", encoded_axios, None, "this jsscript is useless")
-#upload_package("Zane", "1.2.5", content3, "bothurl", "maybe this jssript does something")
 
-result = get_package('zane0')
-print(result)
-
-upload_package("lodash", "1.2.5", encoded_cloudinary, None, "jsscript")
+update_package("NewPackage", "1.2.3", "NewPackage1.2.3", encoded_cloudinary, None, "jsscript")
+get_package("NewPackage1.2.3")
 print(get_all_packages())
+print(get_package_history("NewPackage"))
 '''
