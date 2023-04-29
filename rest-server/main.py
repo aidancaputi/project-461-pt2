@@ -177,7 +177,7 @@ def add_package():
     clean_up()
 
     #got content and not url
-    if ('Content' in request_content) and ('URL' not in request_content):
+    if (('Content' in request_content) or ('content' in request_content)) and (('URL' not in request_content) and ('url' not in request_content) and ('Url' not in request_content)):
 
         print("got content but not url")
 
@@ -208,7 +208,7 @@ def add_package():
         clean_up()
 
     #got url and not content
-    elif ('URL' in request_content) and ('Content' not in request_content):
+    elif (('URL'  in request_content) or ('url' in request_content) or ('Url' in request_content)) and (('Content' not in request_content) and ('content' not in  request_content)):
         
         print("got url but not content")
         url = request_content['URL']
