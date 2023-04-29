@@ -177,7 +177,7 @@ def add_package():
     clean_up()
 
     #got content and not url
-    if ('Content' in request_content) and ('URL' not in request_content):
+    if (('Content' in request_content) or ('content' in request_content)) and (('URL' not in request_content) and ('url' not in request_content) and ('Url' not in request_content)):
 
         print("got content but not url")
 
@@ -208,7 +208,7 @@ def add_package():
         clean_up()
 
     #got url and not content
-    elif ('URL' in request_content) and ('Content' not in request_content):
+    elif (('URL'  in request_content) or ('url' in request_content) or ('Url' in request_content)) and (('Content' not in request_content) and ('content' not in  request_content)):
         
         print("got url but not content")
         url = request_content['URL']
@@ -361,13 +361,24 @@ def authenticate():
 def pkgbyName(name):
     print("package byName entered with method: " + str(flask.request.method))
     if flask.request.method == 'GET':
-        pass
-        # query database using name variable
+        
+        resp = databaseFunctions.get_package_history(name)
+
+        if resp == 404:
+            return 'no package found',404
+        
+        return resp
+        
+    # query database using name variable
     elif flask.request.method == 'DELETE':
-        pass
         # delete name from database
-    
-    return
+
+        resp = databaseFunctions.delete_history(name)
+
+        if resp == 404:
+            return 'no package found',404
+        
+        return 'package deleted successfully'
 
 # @app.route("/package/byRegEx", methods = ['POST'])
 # def byRegEx():
