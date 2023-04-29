@@ -437,12 +437,12 @@ def delete_blob(blob_name):
     blob.delete(if_generation_match=generation_match_precondition)
 
 
-with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
+""" with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
     encoded_cloudinary = base64.b64encode(file1.read())
 with open("test_zips/axios-1.x.zip", "rb") as file2:
     encoded_axios = base64.b64encode(file2.read())
 with open("test_zips/zip-master.zip", "rb") as file3:
-    encoded_zip = base64.b64encode(file3.read())
+    encoded_zip = base64.b64encode(file3.read()) """
 
 '''
 reset_database()
