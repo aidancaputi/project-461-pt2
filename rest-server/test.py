@@ -272,7 +272,7 @@ def main():
     
     #post regex
     reg_json = {
-        "RegEx" : "*"
+        "RegEx" : "a*"
     }
 
     try:

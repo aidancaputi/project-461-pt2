@@ -402,23 +402,27 @@ def pkgbyName(name):
 
 @app.route("/package/byRegEx", methods = ['POST'])
 def byRegEx():
+    match_pkgs = []
+    return_json = flask.jsonify(match_pkgs)
+    return_json.headers.add('Access-Control-Allow-Origin','*')
+
     request_content = flask.request.get_json()
 
     try:
         reg = request_content['RegEx']
         print(reg)
     except:
-        return 'improperly formatted request',400
+        return return_json,400
     
     all_pkgs = json.loads(databaseFunctions.get_all_packages())
-    match_pkgs = []
+    
 
     print('all packages',all_pkgs)
 
     for p in all_pkgs:
         print(p)
-        currID = p['Name']
-        if re.match(reg,currID) is not None:
+        currName = p['Name']
+        if re.match(reg,currName) is not None:
             p.pop('ID')
             temp = p
             match_pkgs.append(temp)

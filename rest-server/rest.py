@@ -1,6 +1,7 @@
 import re
+import json
 
-reg = 'b+'
+reg = 'a*'
 result = [['a','b','b'],['c','d','e']]
 all_pkgs = []
 
@@ -11,6 +12,9 @@ for row in result:
             'ID': row[2]
         }
         all_pkgs.append(package)
+
+all_pkgs = json.dumps(all_pkgs)
+all_pkgs = json.loads(all_pkgs)
 
 match_pkgs = []
 
