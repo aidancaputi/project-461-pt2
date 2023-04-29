@@ -281,17 +281,21 @@ def get_metrics(package_id):
     print("getting info on id from database")
     db_resp = databaseFunctions.get_package(package_id)
     print("got info on id from database")
+    
+    if db_resp == 404:
+        return 'package not found',404
+    else:
+        #get url from content
+        url = db_resp['data']['URL']
+        print("found url in the database response")
 
-    #get url from content
-    url = db_resp['data']['URL']
-    print("found url in the database response")
+        #use the URL to make request to pt1 server
+        print("making request to pt1 server")
+        response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
+        print("got response from pt1 server: "+ str(response.content))
 
-    #use the URL to make request to pt1 server
-    print("making request to pt1 server")
-    response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
-    print("got response from pt1 server: "+ str(response.content))
+        return response.content
 
-    return response.content
 
 # /reset
 @app.route("/reset", methods = ['DELETE'])

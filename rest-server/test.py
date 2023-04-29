@@ -18,13 +18,13 @@ def main():
 
     count = 0
 
-    #put /authenticate X
-    #post /package X
-    #put /package/id
+    #put /authenticate
+    #post /package
+    #put /package/id X
     #get /package/id X
-    #get /package/id/rate X
-    #post second /package X
-    #post /packages X
+    #get /package/id/rate
+    #post second /package
+    #post /packages
     #get /package/byname/name  X
     #post /package/regex
     #delete /package/byname/name X
@@ -91,6 +91,28 @@ def main():
         failed_tests.append('PUT PKG ID')
         traceback.print_exc()
         print("put /package/id failed with code above")
+    
+    #put /package/id-- come back to this one -> should fail
+    try:    
+        put_package_id = {
+            "metadata": {
+                "Name": "cloudinary",
+                "Version": cloudinary_ver,
+                "ID": 'askdjhfka'
+            },
+            "data": {
+                "Content": str(encoded_cloudinary)[2:],
+                "URL": "https://github.com/cloudinary/cloudinary_npm",
+                "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success 2')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+            }
+        }
+        put_package_id_resp = requests.put('https://rest-server-h5si5ezrea-uc.a.run.app/package/cloudinaryaaa', json=put_package_id)
+        print('\nPUT PKG ID RESPONSE CODE: ',str(put_package_id_resp.status_code),' ',str(put_package_id_resp.content),'\n')
+        count += 1
+    except:
+        failed_tests.append('PUT PKG ID')
+        traceback.print_exc()
+        print("put /package/id failed with code above")
 
     #get /package/id
     try:
@@ -102,10 +124,31 @@ def main():
         failed_tests.append('GET PKG ID')
         traceback.print_exc()
         print("get pkg/id failed with code above")
+    
+    #get /package/id -> should return 404
+    try:
+        get_package_id_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/klhaefa')
+        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code))
+        count += 1
+    except:
+        failed_tests.append('GET PKG ID')
+        traceback.print_exc()
+        print("get pkg/id failed with code above")
 
     #get /package/id/rate
     try:
         get_package_id_rate_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}/rate')
+        print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
+
+        count += 1
+    except:
+        failed_tests.append('GET PKG ID RATE')
+        traceback.print_exc()
+        print("get /package/id/rate failed with code above")
+
+     #get /package/id/rate -> should fail
+    try:
+        get_package_id_rate_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/cloudinaryarqaefa/rate')
         print('\nGET PKG ID RATE RESPONSE CODE: ',str(get_package_id_rate_resp.status_code),' ',str(get_package_id_rate_resp.content),'\n')
 
         count += 1
@@ -132,7 +175,7 @@ def main():
 
     #post /packages
     try:
-        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": "Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
+        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": f"Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
         count += 1
@@ -152,6 +195,17 @@ def main():
         failed_tests.append('GET PKG BYNAME')
         traceback.print_exc()
         print("get /package/byName failed with code above")
+
+    #get /package/byname/name -> should return 404
+    try:
+        get_package_name_resp = requests.get('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/axiosssss')
+        print('\nGET PKG BYNAME RESPONSE CODE: ',str(get_package_name_resp.status_code),' ',str(get_package_name_resp.content),'\n')
+
+        count += 1
+    except:
+        failed_tests.append('GET PKG BYNAME')
+        traceback.print_exc()
+        print("get /package/byName failed with code above")
     
     #delete /package/byname/name
     try:
@@ -163,8 +217,30 @@ def main():
         failed_tests.append('DELETE PKG BYNAME')
         traceback.print_exc()
         print("delete /package/byName failed with code above")
+    
+     #delete /package/byname/name -> should return 404
+    try:
+        delete_package_name_resp = requests.delete('https://rest-server-h5si5ezrea-uc.a.run.app/package/byName/axiosssss')
+        print('\nDEL PKG BYNAME RESPONSE CODE: ',str(delete_package_name_resp.status_code),' ',str(delete_package_name_resp.content),'\n')
+
+        count += 1
+    except:
+        failed_tests.append('DELETE PKG BYNAME')
+        traceback.print_exc()
+        print("delete /package/byName failed with code above")
 
     #delete /package/id
+    try:
+        delete_package_id_resp = requests.delete(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
+        print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
+
+        count += 1
+    except:
+        failed_tests.append('DEL PKG ID')
+        traceback.print_exc()
+        print("delete /package/id failed with code above")
+    
+    #delete /package/id -> should return 404
     try:
         delete_package_id_resp = requests.delete(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         print('\nDEL PKG BY ID RESPONSE CODE: ',str(delete_package_id_resp.status_code),' ',str(delete_package_id_resp.content),'\n')
