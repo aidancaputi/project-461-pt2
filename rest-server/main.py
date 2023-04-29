@@ -11,6 +11,7 @@ import json
 from os import path
 import stat
 import requests
+import re
 
 app = flask.Flask(__name__)
 
@@ -281,7 +282,7 @@ def get_metrics(package_id):
     print("getting info on id from database")
     db_resp = databaseFunctions.get_package(package_id)
     print("got info on id from database")
-    
+
     if db_resp == 404:
         return 'package not found',404
     else:
@@ -399,8 +400,29 @@ def pkgbyName(name):
         
         return 'package deleted successfully'
 
-# @app.route("/package/byRegEx", methods = ['POST'])
-# def byRegEx():
+@app.route("/package/byRegEx", methods = ['POST'])
+def byRegEx():
+    request_content = flask.request.get_json()
+
+    try:
+        reg = request_content['RegEx']
+        print(reg)
+    except:
+        return 'improperly formatted request',400
+    
+    all_pkgs = databaseFunctions.get_all_packages()
+    match_pkgs = []
+
+    for p in all_pkgs:
+        currID = p['Name']
+        if re.match(reg,currID) is not None:
+            p.pop('ID')
+            temp = p
+            match_pkgs.append(temp)
+    
+    return match_pkgs
+        
+
 
 
 if __name__ == "__main__":
