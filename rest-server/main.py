@@ -65,8 +65,9 @@ def search_packages():
 
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
-
-    print("packges found that match query: "+ str(return_list))
+    return_json = flask.jsonify(return_json)
+    return_json.headers.add('Access-Control-Allow-Origin','*')
+    print("packages found that match query: "+ str(return_list))
 
     return return_json, 200
 
