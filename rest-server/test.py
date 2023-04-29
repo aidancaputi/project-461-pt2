@@ -60,8 +60,8 @@ def main():
         }
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
 
-        post_pkg_url_resp_json = json.loads(len(str(post_pkg_url_resp.content['content'])))
-        print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
+        post_pkg_url_resp_json = json.loads(post_pkg_url_resp.content)
+        print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(len(post_pkg_url_resp_json['data']['Content'])),'\n')
         count += 1
         cloudinary_id = post_pkg_url_resp_json['metadata']['ID']
         cloudinary_ver = post_pkg_url_resp_json['metadata']['Version']
@@ -95,7 +95,8 @@ def main():
     #get /package/id
     try:
         get_package_id_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
-        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(get_package_id_resp.content),'\n')
+        get_package_id_resp_json = json.loads(get_package_id_resp.content)
+        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(len(get_package_id_resp_json['data']['Content'])),'\n')
         count += 1
     except:
         failed_tests.append('GET PKG ID')
@@ -120,7 +121,8 @@ def main():
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_base64_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_base642)
-        print('\nPOST PKG B64 AXIOS RESPONSE CODE: ',str(post_pkg_base64_resp2.status_code),' ',str(post_pkg_base64_resp2.content),'\n')
+        post_pkg_base64_resp2_json = json.loads(post_pkg_base64_resp2.content)
+        print('\nPOST PKG B64 AXIOS RESPONSE CODE: ',str(post_pkg_base64_resp2.status_code),' ',str(len(post_pkg_base64_resp2_json['data']['Content'])),'\n')
 
         count += 1
     except:
@@ -180,7 +182,8 @@ def main():
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_url_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url2)
-        print('\nPOST PKG URL2 RESPONSE CODE: ',str(post_pkg_url_resp2.status_code),' ',str(post_pkg_url_resp2.content),'\n')
+        post_pkg_url_resp2_json = json.loads(post_pkg_url_resp2.content)
+        print('\nPOST PKG URL2 RESPONSE CODE: ',str(post_pkg_url_resp2.status_code),' ',str(len(post_pkg_url_resp2_json['data']['Content'])),'\n')
 
         count += 1
     except:

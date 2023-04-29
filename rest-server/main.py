@@ -41,6 +41,11 @@ def search_packages():
     #print(packages_json)
 
     #go through the packages and return a match if there is one
+
+    print('packages to search through',packages_json)
+    print('version to search for',exact_version)
+    print('name to search for',name)
+
     for package in packages_json:
 
         if((package['Version'] == exact_version) and (package['Name'] == name)):
