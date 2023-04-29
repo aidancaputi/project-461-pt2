@@ -18,11 +18,12 @@ app = flask.Flask(__name__)
 def plain():
     return 'Project homepage'
 
-# /packages
+# POST /packages
 @app.route('/packages', methods = ['POST'])
 def search_packages():
 
     return_list = []
+    counter = 0
     
     #request has name and version
     request_content = flask.request.get_json()
@@ -46,19 +47,27 @@ def search_packages():
     print('version to search for',exact_version)
     print('name to search for',name)
 
+    #go through all the packages returned from database
     for package in packages_json:
 
+        #if the package matches the query
         if((package['Version'] == exact_version) and (package['Name'] == name)):
             
             #format and return 
             return_list.append(package)
+
+            counter += 1
+
+            #if there were more than 1000 packages that match, return 413
+            if(counter > 1000):
+                return "Too many packages matched that query (> 1000)", 413
 
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
 
     print("packges found that match query: "+ str(return_list))
 
-    return return_json
+    return return_json, 200
 
 #takes a path to a folder and zips it, then encodes the zip into a base64 string
 def encode_repo(repo_path):
@@ -292,7 +301,7 @@ def reset():
     print("database reset success")
     response = flask.jsonify(success=True)
     print("responding 200 ok about delete reset")
-    return response
+    return response, 200
 
 # PUT /package/{id}
 @app.route("/package/<id>", methods = ['PUT','GET','DELETE'])
@@ -309,7 +318,7 @@ def put_by_id(id):
 
         print("request content got succesfuly from request")
 
-        #extract all the info from the request json
+        #extract all the info from the request json and return 400 if missing something
         try:
             put_id = request_content['metadata']['ID']
             put_name = request_content['metadata']['Name']
@@ -337,6 +346,7 @@ def put_by_id(id):
         # send query to get <id> in variable id
         db_resp = databaseFunctions.get_package(id)
 
+        #if the package wasnt in the database, return 404
         if(db_resp == 404):
             return "No package with that ID exists", 404
         
@@ -387,9 +397,6 @@ def pkgbyName(name):
 
 # @app.route("/package/byRegEx", methods = ['POST'])
 # def byRegEx():
-
-
-
 
 
 if __name__ == "__main__":
