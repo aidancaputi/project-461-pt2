@@ -56,6 +56,7 @@ def main():
     try:
         post_pkg_url = {
             "URL": 'https://github.com/cloudinary/cloudinary_npm',
+            "Content" : None,
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
@@ -161,6 +162,7 @@ def main():
     try:
         post_pkg_base642 = {
             "Content": str(encoded_axios)[2:],
+            "URL" : None,
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_base64_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_base642)
@@ -254,6 +256,7 @@ def main():
     #post /package - URL
     try:
         post_pkg_url2 = {
+            "Content" : None,
             "URL": 'https://github.com/moleculerjs/moleculer',
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
