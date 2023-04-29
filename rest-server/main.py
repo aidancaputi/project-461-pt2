@@ -26,6 +26,7 @@ def search_packages():
     
     #request has name and version
     request_content = flask.request.get_json()
+    print(request_content)
     #print(request_content)
     name = request_content['Name']
     version = request_content['Version']
@@ -171,6 +172,7 @@ def add_package():
     request_content = flask.request.get_json()
     content = 0
     url = 0
+    print(request_content)
 
     clean_up()
 
@@ -298,6 +300,7 @@ def put_by_id(id):
         print("it was put, getting request content")
         #get the request content json
         request_content = flask.request.get_json()
+        print(request_content)
 
         print("request content got succesfuly from request")
 
