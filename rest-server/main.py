@@ -65,8 +65,7 @@ def search_packages():
 
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
-    return_json = flask.jsonify(return_json)
-    return_json.headers.add('Access-Control-Allow-Origin','*')
+    
     print("packages found that match query: "+ str(return_list))
 
     return return_json, 200
@@ -420,8 +419,11 @@ def byRegEx():
             p.pop('ID')
             temp = p
             match_pkgs.append(temp)
-    
-    return match_pkgs
+
+    return_json = flask.jsonify(match_pkgs)
+    return_json.headers.add('Access-Control-Allow-Origin','*')
+
+    return return_json
         
 
 
