@@ -119,6 +119,7 @@ def get_package(id):
         for row in package_data:
             if row[3]: # URL
                 content = read_blob(id)
+                content_str = chopString(content)
                 package = {
                     'metadata': {
                         'Name': row[1],
@@ -126,13 +127,14 @@ def get_package(id):
                         'ID': row[0]
                     },
                     'data': {
-                        'Content': content,
+                        'Content': content_str,
                         'URL': row[3],
                         'JSProgram': row[4]
                     }
                 }
             else: # only content
                 content = read_blob(id)
+                content_str = chopString(content)
                 package = {
                     'metadata': {
                         'Name': row[1],
@@ -140,7 +142,7 @@ def get_package(id):
                         'ID': row[0]
                     },
                     'data': {
-                        'Content': content,
+                        'Content': content_str,
                         'JSProgram': row[4]
                     }
                 }
@@ -280,6 +282,8 @@ def upload_package(name, version, content, url, jsprogram):
 
     # build response JSON
     package = {}
+    content_str = chopString(content)
+
     if content and url: # both URL and content
         package = {
             'metadata': {
@@ -288,7 +292,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': new_id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': content_str,
                 'URL': url,
                 'JSProgram': jsprogram
             }
@@ -301,7 +305,7 @@ def upload_package(name, version, content, url, jsprogram):
                 'ID': new_id
             },
             'data': {
-                'Content': str(content)[:500],
+                'Content': content_str,
                 'JSProrgam': jsprogram
             }
         }
@@ -337,6 +341,15 @@ def get_package_history(name):
     
     return json.dumps(package_versions) # convert the list of dictionaries to JSON format and return it
 
+def chopString(data):
+    if len(data) > 32000000:
+        content_str = str(data[:3000000])
+        
+    else:
+        content_str =  str(data)
+    
+    return content_str
+    
 
 def create_bucket():
     # Instantiates a client
@@ -358,6 +371,10 @@ def delete_bucket():
     bucket.delete(force=True)
 
 def write_blob(blob_name, content):
+    try:
+        content = content.encode()
+    except:
+        pass
     bucket_name = "ece461bucket"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)

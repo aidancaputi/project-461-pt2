@@ -2,6 +2,7 @@ import requests
 import json
 import base64
 import traceback
+import zipfile
 
 def main():
     failed_tests = []
@@ -59,7 +60,7 @@ def main():
         }
         post_pkg_url_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_url)
 
-        post_pkg_url_resp_json = json.loads(post_pkg_url_resp.content)
+        post_pkg_url_resp_json = json.loads(len(str(post_pkg_url_resp.content['content'])))
         print('\nPOST PKG 1 RESPONSE CODE: ',str(post_pkg_url_resp.status_code),' ',str(post_pkg_url_resp.content),'\n')
         count += 1
         cloudinary_id = post_pkg_url_resp_json['metadata']['ID']
@@ -78,7 +79,7 @@ def main():
                 "ID": cloudinary_id
             },
             "data": {
-                "Content": str(encoded_cloudinary),
+                "Content": str(encoded_cloudinary)[2:],
                 "URL": "https://github.com/cloudinary/cloudinary_npm",
                 "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success 2')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
             }
@@ -115,7 +116,7 @@ def main():
     #post /package - base64 SECOND
     try:
         post_pkg_base642 = {
-            "Content": str(encoded_axios),
+            "Content": str(encoded_axios)[2:],
             "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
         }
         post_pkg_base64_resp2 = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package', json=post_pkg_base642)

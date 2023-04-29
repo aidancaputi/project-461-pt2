@@ -243,7 +243,7 @@ def add_package():
 
     else: 
 
-        print("both or neither content/url were set, bad requst 400")
+        print("both or neither content/url were set, bad request 400")
         #this would be if both or neither field were set
         return "Bad request", 400
 
