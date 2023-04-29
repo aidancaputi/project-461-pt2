@@ -199,6 +199,7 @@ def delete_package(id):
     pool = authenticate()
     with pool.connect() as db_conn:
         # search for package
+        print("deleting package with id " + id)
         package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM packages WHERE ID = :id_value"), 
                                        parameters={"id_value": id})
         db_conn.commit()
@@ -341,6 +342,30 @@ def get_package_history(name):
     
     return json.dumps(package_versions) # convert the list of dictionaries to JSON format and return it
 
+# DELETE /package/byName/{name}
+def delete_history(name):
+    pool = authenticate()
+    with pool.connect() as db_conn:
+        # search for package version history
+        package_data = db_conn.execute(sqlalchemy.text("SELECT * FROM package_versions WHERE Name = :name_value"), 
+                                       parameters={"name_value": name})
+        db_conn.commit()
+
+        for row in package_data:
+            print(row[0])
+            delete_package(row[0])
+
+            # delete package
+            db_conn.execute(sqlalchemy.text("DELETE FROM package_versions WHERE ID = :id_value"), 
+                                        parameters={"id_value": row[0]})
+            db_conn.commit()
+        
+        if row in package_data:
+            return 200 # package history is deleted
+    
+    pool.dispose()
+    return 404 # package does not exist
+
 def chopString(data):
     if len(data) > 32000000:
         content_str = str(data[:3000000])
@@ -411,18 +436,28 @@ def delete_blob(blob_name):
 
     blob.delete(if_generation_match=generation_match_precondition)
 
-'''
+
 with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
     encoded_cloudinary = base64.b64encode(file1.read())
 with open("test_zips/axios-1.x.zip", "rb") as file2:
     encoded_axios = base64.b64encode(file2.read())
+with open("test_zips/zip-master.zip", "rb") as file3:
+    encoded_zip = base64.b64encode(file3.read())
 
+'''
 reset_database()
 upload_package("NewPackage", "1.2.3", encoded_cloudinary, "testurl", "jsscript is super cool")
 upload_package("AidanCaputi", "1.2.4", encoded_axios, None, "this jsscript is useless")
 
 update_package("NewPackage", "1.2.3", "NewPackage1.2.3", encoded_cloudinary, None, "jsscript")
 get_package("NewPackage1.2.3")
+print(get_all_packages())
+print(get_package_history("NewPackage"))
+
+upload_package("NewPackage", "2.0.0", encoded_zip, None, "amazing jsscript")
+print(get_all_packages())
+print(get_package_history("NewPackage"))
+print(delete_history("NewPackage"))
 print(get_all_packages())
 print(get_package_history("NewPackage"))
 '''
