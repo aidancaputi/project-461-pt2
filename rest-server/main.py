@@ -111,6 +111,8 @@ def look_for_package(name, version, type):
                 #if there were more than 1000 packages that match, return 413
                 if(counter > 1000):
                     return "Too many packages matched that query (> 1000)", 413
+    
+    return return_list
 
 
 # POST /packages
@@ -134,22 +136,38 @@ def search_packages():
             both_versions = version.split('-')
             lower = both_versions[0]
             upper = both_versions[1]
-            return_list += look_for_package(name, [lower, upper], 'range')
+            resp = look_for_package(name, [lower, upper], 'range')
+            if len(resp) == 2:
+                if resp[1] == 413:
+                    return "Too many packages matched that query (> 1000)", 413
+            return_list += resp
             
         elif '^' in item:
             #carrot
             lower_version = version.replace('^', '')
-            return_list += look_for_package(name, lower_version, 'carrot')
+            resp = look_for_package(name, lower_version, 'carrot')
+            if len(resp) == 2:
+                if resp[1] == 413:
+                    return "Too many packages matched that query (> 1000)", 413
+            return_list += resp
         
         elif '~' in item:
             #tilde
             approx_version = version.replace('~', '')
-            return_list += look_for_package(name, approx_version, 'tilde')
+            resp = look_for_package(name, approx_version, 'tilde')
+            if len(resp) == 2:
+                if resp[1] == 413:
+                    return "Too many packages matched that query (> 1000)", 413
+            return_list += resp
         
         else:
             #exact
             exact_version = version
-            return_list += look_for_package(name, exact_version, 'exact')
+            resp = look_for_package(name, exact_version, 'exact')
+            if len(resp) == 2:
+                if resp[1] == 413:
+                    return "Too many packages matched that query (> 1000)", 413
+            return_list += resp
     
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
