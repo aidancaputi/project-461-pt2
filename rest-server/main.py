@@ -455,7 +455,7 @@ def put_by_id(id):
 
         # if no URL, find it from content
         if put_URL == None:
-            content = request_content['Content']
+            content = request_content['data']['Content']
 
             #if encoded was set, decode it and unzip
             convert_base64_and_unzip(content)
