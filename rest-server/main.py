@@ -99,10 +99,10 @@ def look_for_package(name, version, type):
         upper = version.replace('.', ', ')
         upper_tup = list(map(int, upper.split(', ')))
 
-        orig_tup = tuple(upper_tup)
-        
-        upper_tup[1] = str(int(upper_tup[1]) + 1)
-        upper_tup[2] = '0'
+        orig_tup = tuple(map(int, upper.split(', ')))
+
+        upper_tup[1] = upper_tup[1] + 1
+        upper_tup[2] = 0
         upper_tup = tuple(upper_tup)
         
         print('type was tilde')
