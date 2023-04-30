@@ -33,8 +33,7 @@ def look_for_package(name, version, type):
             if((package['Version'] == version) and (package['Name'] == name)):
                 
                 #format and return 
-                if package not in return_list:
-                    return_list.append(package)
+                return_list.append(package)
 
                 counter += 1
 
@@ -58,8 +57,7 @@ def look_for_package(name, version, type):
             if((package_tup >= lower_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
                 
                 #format and return 
-                if package not in return_list:
-                    return_list.append(package)
+                return_list.append(package)
 
                 counter += 1
 
@@ -81,8 +79,7 @@ def look_for_package(name, version, type):
             if((package_tup >= lower_tup) and (package['Name'] == name)):
                 
                 #format and return 
-                if package not in return_list:
-                    return_list.append(package)
+                return_list.append(package)
 
                 counter += 1
 
@@ -112,8 +109,7 @@ def look_for_package(name, version, type):
             if((package_tup >= orig_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
                 
                 #format and return 
-                if package not in return_list:
-                    return_list.append(package)
+                return_list.append(package)
 
                 counter += 1
 
@@ -158,6 +154,7 @@ def search_packages():
             if len(resp) == 2:
                 if resp[1] == 413:
                     return "Too many packages matched that query (> 1000)", 413
+                
             return_list += resp
         
         elif '~' in version:
@@ -178,10 +175,16 @@ def search_packages():
                     return "Too many packages matched that query (> 1000)", 413
             return_list += resp
     
+    final_list = []
+
+    for item in return_list:
+        if item not in final_list:
+            final_list.append(item)
+
     #turn the list of packages into json and return it
-    return_json = json.dumps(return_list)
+    return_json = json.dumps(final_list)
     
-    print("packages found that match query: "+ str(return_list))
+    print("packages found that match query: "+ str(final_list))
 
     return return_json, 200
 
