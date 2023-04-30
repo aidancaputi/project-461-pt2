@@ -3,7 +3,6 @@ from database import databaseFunctions
 import base64
 import flask
 from git import Repo
-import pathlib
 import zipfile
 import shutil
 import os
@@ -24,18 +23,18 @@ def look_for_package(name, version, type):
     counter = 0
     return_list = []
     packages_json = json.loads(databaseFunctions.get_all_packages())
-    print('inside look')
 
     if type == 'exact':
         print('type was exact')
         #go through all the packages returned from database
         for package in packages_json:
-            print('current package',package,'checking against',version,name)
+            
             #if the package matches the query
             if((package['Version'] == version) and (package['Name'] == name)):
-                print('match')
+                
                 #format and return 
-                return_list.append(package)
+                if package not in return_list:
+                    return_list.append(package)
 
                 counter += 1
 
@@ -45,7 +44,6 @@ def look_for_package(name, version, type):
                 
     if type == 'range':
         print('type was range')
-        print(version)
         lower = version[0].replace('.', ', ')
         upper = version[1].replace('.', ', ')
         lower_tup = tuple(map(int, lower.split(', ')))
@@ -54,15 +52,14 @@ def look_for_package(name, version, type):
 
         #go through all the packages returned from database
         for package in packages_json:
-            print('current package',package,'checking against',lower_tup,upper_tup)
             package_tup = tuple(map(int, package['Version'].split('.')))
 
             #if the package matches the query
             if((package_tup >= lower_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
-                print('match')
                 
                 #format and return 
-                return_list.append(package)
+                if package not in return_list:
+                    return_list.append(package)
 
                 counter += 1
 
@@ -71,22 +68,21 @@ def look_for_package(name, version, type):
                     return "Too many packages matched that query (> 1000)", 413
                 
     if type == 'carrot':
-        print('type was carrot/caret')
+        print('type was carrot')
         lower = version.replace('.', ', ')
         lower_tup = tuple(map(int, lower.split(', ')))
 
         #go through all the packages returned from database
         for package in packages_json:
-            print('current package',package,'checking against',name,lower_tup)
 
             package_tup = tuple(map(int, package['Version'].split('.')))
             
             #if the package matches the query
             if((package_tup >= lower_tup) and (package['Name'] == name)):
-                print('match')
                 
                 #format and return 
-                return_list.append(package)
+                if package not in return_list:
+                    return_list.append(package)
 
                 counter += 1
 
@@ -114,17 +110,17 @@ def look_for_package(name, version, type):
 
             #if the package matches the query
             if((package_tup >= orig_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
-                print('match')
                 
                 #format and return 
-                return_list.append(package)
+                if package not in return_list:
+                    return_list.append(package)
 
                 counter += 1
 
                 #if there were more than 1000 packages that match, return 413
                 if(counter > 1000):
                     return "Too many packages matched that query (> 1000)", 413
-    print(return_list)
+    
     return return_list
 
 # POST /packages
@@ -163,7 +159,6 @@ def search_packages():
                 if resp[1] == 413:
                     return "Too many packages matched that query (> 1000)", 413
             return_list += resp
-            print('ending carrot')
         
         elif '~' in version:
             #tilde
@@ -288,16 +283,6 @@ def clean_up():
         print("there was nothing to clean up")
         pass
 
-#takes a git url and downloads the zip
-def get_zip(git_url, outfile_name):
-    split_at_slash = git_url.split('/')
-    owner = split_at_slash[3]
-    name = split_at_slash[4]
-    req_url = 'https://api.github.com/repos/' + owner + '/' + name + '/zipball'
-    resp = requests.get('https://api.github.com/repos/lodash/lodash/zipball')
-    with open(outfile_name, "wb") as f:
-        f.write(resp.content)
-
 # /package
 @app.route('/package', methods = ['POST'])
 def add_package():
@@ -334,7 +319,6 @@ def add_package():
             return '{}', 400
                 
         #upload to database
-        print("calling upload_package with: " + package_name + " " + package_version + " " + package_url + " " + request_content['JSProgram'])
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, content, package_url, request_content['JSProgram'])
 
         #if it alreayd existed in database, clean and exit
@@ -353,7 +337,6 @@ def add_package():
         
         #clone the url
         Repo.clone_from(url, "cloned_repo")
-        print("repo cloned")
 
         #parse the local repo for the name and version
         package_name, package_version = parse_for_info(need_url=False)
@@ -368,7 +351,6 @@ def add_package():
         encoding = encode_repo("cloned_repo")
 
         #upload to database
-        print("calling upload_package with: " + package_name + " " + package_version + " " + url + " " + request_content['JSProgram'])
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, encoding, url, request_content['JSProgram'])
 
         #if it already existed, clean and exit
@@ -391,7 +373,6 @@ def add_package():
     return_json.headers.add('Transfer-Encoding','chunked') 
 
     print("post /package success")
-    print('headers',return_json.headers)
 
     return return_json
 
@@ -402,16 +383,13 @@ def get_metrics(package_id):
     print("enter get /rate for id: "+ str(package_id))
 
     #get package info from database
-    print("getting info on id from database")
     db_resp = databaseFunctions.get_package(package_id)
-    print("got info on id from database")
 
     if db_resp == 404:
         return 'package not found',404
     else:
         #get url from content
         url = db_resp['data']['URL']
-        print("found url in the database response")
 
         #use the URL to make request to pt1 server
         print("making request to pt1 server")
@@ -428,7 +406,6 @@ def reset():
     databaseFunctions.reset_database()
     print("database reset success")
     response = flask.jsonify(success=True)
-    print("responding 200 ok about delete reset")
     return response, 200
 
 # PUT /package/{id}
@@ -444,8 +421,6 @@ def put_by_id(id):
         request_content = flask.request.get_json()
         print(request_content)
 
-        print("request content got succesfuly from request")
-
         #extract all the info from the request json and return 400 if missing something
         try:
             put_id = request_content['metadata']['ID']
@@ -457,8 +432,6 @@ def put_by_id(id):
         except:
             print("error reading fields from request")
             return "Missing fields", 400
-
-        print("got all fields from request successfully")
 
         # if no URL, find it from content
         if put_URL == None:
@@ -551,9 +524,6 @@ def byRegEx():
     
     all_pkgs = json.loads(databaseFunctions.get_all_packages())
     
-
-    print('all packages',all_pkgs)
-
     for p in all_pkgs:
         print(p)
         currName = p['Name']
@@ -568,8 +538,6 @@ def byRegEx():
     return_json.headers.add('Access-Control-Allow-Origin','*')
 
     return return_json
-        
-
 
 
 if __name__ == "__main__":
