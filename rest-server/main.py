@@ -340,6 +340,18 @@ def put_by_id(id):
 
         print("got all fields from request successfully")
 
+        # if no URL, find it from content
+        if put_URL == None:
+            content = request_content['Content']
+
+            #if encoded was set, decode it and unzip
+            convert_base64_and_unzip(content)
+
+            #parse the unzipped repo for the name, version, and url
+            package_url = parse_for_info(need_url=True)[2]
+
+            put_URL = package_url
+
         #use request info above to update database now
         db_resp = databaseFunctions.update_package(put_name, put_Version, put_id, put_content, put_URL, put_JSProgram)
 
