@@ -56,7 +56,8 @@ def create_table():
             "Version VARCHAR(255) NOT NULL, "
             "Date VARCHAR(255) NOT NULL, "
             "Action VARCHAR(255) NOT NULL, "
-            "PRIMARY KEY (Date));"
+            "PreciseDate VARCHAR(255) NOT NULL, "
+            "PRIMARY KEY (PreciseDate));"
             )
         )
         db_conn.commit()
@@ -126,9 +127,10 @@ def get_package(id):
             
             # update package version history with a new download entry
             insert_stmt = sqlalchemy.text(
-                "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+                "INSERT INTO package_versions (ID, Name, Version, Date, Action, PreciseDate) VALUES (:ID, :Name, :Version, :Date, :Action, :PreciseDate)",)
             dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
-            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DOWNLOAD"})
+            preciseDateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%S.%fZ")
+            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DOWNLOAD", "PreciseDate": preciseDateTime})
             db_conn.commit() # commit transactions
 
     if package == {}: # no package found
@@ -157,9 +159,10 @@ def update_package(name, version, id, new_content, new_url, new_jsprogram):
 
                 # update package version history with a new download entry
                 insert_stmt = sqlalchemy.text(
-                    "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+                    "INSERT INTO package_versions (ID, Name, Version, Date, Action, PreciseDate) VALUES (:ID, :Name, :Version, :Date, :Action, :PreciseDate)",)
                 dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
-                db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Date": dateTime, "Action": "UPDATE"})
+                preciseDateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%S.%fZ")
+                db_conn.execute(insert_stmt, parameters={"ID": id, "Name": name, "Version": version, "Date": dateTime, "Action": "UPDATE", "PreciseDate": preciseDateTime})
                 db_conn.commit()
                 pool.dispose()
 
@@ -184,9 +187,10 @@ def delete_package(id):
 
             # update package version history with a new download entry
             insert_stmt = sqlalchemy.text(
-                "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+                "INSERT INTO package_versions (ID, Name, Version, Date, Action, PreciseDate) VALUES (:ID, :Name, :Version, :Date, :Action, :PreciseDate)",)
             dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
-            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DELETE"})
+            preciseDateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%S.%fZ")
+            db_conn.execute(insert_stmt, parameters={"ID": id, "Name": row[1], "Version": row[2], "Date": dateTime, "Action": "DELETE", "PreciseDate": preciseDateTime})
             db_conn.commit()
             pool.dispose()
             
@@ -232,9 +236,10 @@ def upload_package(name, version, content, url, jsprogram):
 
         # update package version history with a new download entry
         insert_stmt = sqlalchemy.text(
-            "INSERT INTO package_versions (ID, Name, Version, Date, Action) VALUES (:ID, :Name, :Version, :Date, :Action)",)
+            "INSERT INTO package_versions (ID, Name, Version, Date, Action, PreciseDate) VALUES (:ID, :Name, :Version, :Date, :Action, :PreciseDate)",)
         dateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%SZ") # get current date and time
-        db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "Date": dateTime, "Action": "CREATE"})
+        preciseDateTime = datetime.now().strftime("%d-%m-%YT%H:%M:%S.%fZ")
+        db_conn.execute(insert_stmt, parameters={"ID": new_id, "Name": name, "Version": version, "Date": dateTime, "Action": "CREATE", "PreciseDate": preciseDateTime})
         db_conn.commit()
 
     # build response JSON
