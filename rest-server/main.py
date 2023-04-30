@@ -25,13 +25,13 @@ def look_for_package(name, version, type):
     packages_json = json.loads(databaseFunctions.get_all_packages())
 
     if type == 'exact':
-
+        print('type was exact')
         #go through all the packages returned from database
         for package in packages_json:
-
+            print('current package',package,'checking against',version,name)
             #if the package matches the query
             if((package['Version'] == version) and (package['Name'] == name)):
-                
+                print('match')
                 #format and return 
                 return_list.append(package)
 
@@ -47,14 +47,16 @@ def look_for_package(name, version, type):
         upper = version[1].replace('.', ', ')
         lower_tup = tuple(map(int, lower.split(', ')))
         upper_tup = tuple(map(int, upper.split(', ')))
+        print('type was range')
 
         #go through all the packages returned from database
         for package in packages_json:
-
+            print('current package',package,'checking against',lower_tup,upper_tup)
             package_tup = tuple(map(int, package['Version'].split(', ')))
 
             #if the package matches the query
             if((package_tup >= lower_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
+                print('match')
                 
                 #format and return 
                 return_list.append(package)
@@ -66,17 +68,19 @@ def look_for_package(name, version, type):
                     return "Too many packages matched that query (> 1000)", 413
                 
     if type == 'carrot':
-
+        print('type was carrot/caret')
         lower = version.replace('.', ', ')
         lower_tup = tuple(map(int, lower.split(', ')))
 
         #go through all the packages returned from database
         for package in packages_json:
+            print('current package',package,'checking against',name,lower_tup)
 
             package_tup = tuple(map(int, package['Version'].split(', ')))
-
+            
             #if the package matches the query
             if((package_tup >= lower_tup) and (package['Name'] == name)):
+                print('match')
                 
                 #format and return 
                 return_list.append(package)
@@ -94,14 +98,17 @@ def look_for_package(name, version, type):
         orig_tup = upper_tup
         upper_tup[1] = str(int(upper_tup[1]) + 1)
         upper_tup[2] = '0'
+        print('type was tilde')
 
         #go through all the packages returned from database
         for package in packages_json:
+            print('current package',package,'checking against',package_tup,orig_tup,upper_tup,name)
 
             package_tup = tuple(map(int, package['Version'].split(', ')))
 
             #if the package matches the query
             if((package_tup >= orig_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
+                print('match')
                 
                 #format and return 
                 return_list.append(package)
@@ -111,7 +118,7 @@ def look_for_package(name, version, type):
                 #if there were more than 1000 packages that match, return 413
                 if(counter > 1000):
                     return "Too many packages matched that query (> 1000)", 413
-    
+    print(return_list)
     return return_list
 
 
