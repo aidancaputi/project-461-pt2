@@ -108,36 +108,21 @@ def get_package(id):
 
         package = {}
         for row in package_data:
-            if row[3]: # URL and content
-                content = read_blob(id) # get content from bucket
-                content_str = chopString(content) # truncate content as needed
-                # build package JSON
-                package = {
-                    'metadata': {
-                        'Name': row[1],
-                        'Version': row[2],
-                        'ID': row[0]
-                    },
-                    'data': {
-                        'Content': content_str,
-                        'URL': row[3],
-                        'JSProgram': row[4]
-                    }
+            content = read_blob(id) # get content from bucket
+            content_str = chopString(content) # truncate content as needed
+            # build package JSON
+            package = {
+                'metadata': {
+                    'Name': row[1],
+                    'Version': row[2],
+                    'ID': row[0]
+                },
+                'data': {
+                    'Content': content_str,
+                    'URL': row[3],
+                    'JSProgram': row[4]
                 }
-            else: # only content
-                content = read_blob(id)
-                content_str = chopString(content)
-                package = {
-                    'metadata': {
-                        'Name': row[1],
-                        'Version': row[2],
-                        'ID': row[0]
-                    },
-                    'data': {
-                        'Content': content_str,
-                        'JSProgram': row[4]
-                    }
-                }
+            }
             
             # update package version history with a new download entry
             insert_stmt = sqlalchemy.text(
@@ -255,31 +240,18 @@ def upload_package(name, version, content, url, jsprogram):
     # build response JSON
     package = {}
     content_str = chopString(content)
-    if content and url: # both URL and content
-        package = {
-            'metadata': {
-                'Name': name,
-                'Version': version,
-                'ID': new_id
-            },
-            'data': {
-                'Content': content_str,
-                'URL': url,
-                'JSProgram': jsprogram
-            }
+    package = {
+        'metadata': {
+            'Name': name,
+            'Version': version,
+            'ID': new_id
+        },
+        'data': {
+            'Content': content_str,
+            'URL': url,
+            'JSProgram': jsprogram
         }
-    else: # only content
-        package = {
-            'metadata': {
-                'Name': name,
-                'Version': version,
-                'ID': new_id
-            },
-            'data': {
-                'Content': content_str,
-                'JSProrgam': jsprogram
-            }
-        }
+    }
 
     return package
 
