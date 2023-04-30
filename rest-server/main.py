@@ -52,7 +52,7 @@ def look_for_package(name, version, type):
         #go through all the packages returned from database
         for package in packages_json:
             print('current package',package,'checking against',lower_tup,upper_tup)
-            package_tup = tuple(map(int, package['Version'].split(', ')))
+            package_tup = tuple(map(int, package['Version'].split('.')))
 
             #if the package matches the query
             if((package_tup >= lower_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
@@ -76,7 +76,7 @@ def look_for_package(name, version, type):
         for package in packages_json:
             print('current package',package,'checking against',name,lower_tup)
 
-            package_tup = tuple(map(int, package['Version'].split(', ')))
+            package_tup = tuple(map(int, package['Version'].split('.')))
             
             #if the package matches the query
             if((package_tup >= lower_tup) and (package['Name'] == name)):
@@ -104,7 +104,7 @@ def look_for_package(name, version, type):
         for package in packages_json:
             print('current package',package,'checking against',package_tup,orig_tup,upper_tup,name)
 
-            package_tup = tuple(map(int, package['Version'].split(', ')))
+            package_tup = tuple(map(int, package['Version'].split('.')))
 
             #if the package matches the query
             if((package_tup >= orig_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
