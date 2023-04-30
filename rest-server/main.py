@@ -125,12 +125,12 @@ def look_for_package(name, version, type):
     print(return_list)
     return return_list
 
-
-
-def search_packages(request):
+# POST /packages
+@app.route('/packages', methods = ['POST'])
+def search_packages():
 
     #request has name and version
-    request_content = json.loads(request)
+    request_content = flask.request.get_json()
     print(request_content)
     return_list = []
 
