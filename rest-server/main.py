@@ -106,7 +106,6 @@ def look_for_package(name, version, type):
 
         #go through all the packages returned from database
         for package in packages_json:
-            print('current package',package,'checking against',package_tup,orig_tup,upper_tup,name)
 
             package_tup = tuple(map(int, package['Version'].split('.')))
 
