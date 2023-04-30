@@ -19,6 +19,100 @@ app = flask.Flask(__name__)
 def plain():
     return 'Project homepage'
 
+def look_for_package(name, version, type):
+    counter = 0
+    return_list = []
+    packages_json = json.loads(databaseFunctions.get_all_packages())
+
+    if type == 'exact':
+
+        #go through all the packages returned from database
+        for package in packages_json:
+
+            #if the package matches the query
+            if((package['Version'] == version) and (package['Name'] == name)):
+                
+                #format and return 
+                return_list.append(package)
+
+                counter += 1
+
+                #if there were more than 1000 packages that match, return 413
+                if(counter > 1000):
+                    return "Too many packages matched that query (> 1000)", 413
+                
+    if type == 'range':
+
+        lower = version[0].replace('.', ', ')
+        upper = version[1].replace('.', ', ')
+        lower_tup = tuple(map(int, lower.split(', ')))
+        upper_tup = tuple(map(int, upper.split(', ')))
+
+        #go through all the packages returned from database
+        for package in packages_json:
+
+            package_tup = tuple(map(int, package['Version'].split(', ')))
+
+            #if the package matches the query
+            if((package_tup >= lower_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
+                
+                #format and return 
+                return_list.append(package)
+
+                counter += 1
+
+                #if there were more than 1000 packages that match, return 413
+                if(counter > 1000):
+                    return "Too many packages matched that query (> 1000)", 413
+                
+    if type == 'carrot':
+
+        lower = version.replace('.', ', ')
+        lower_tup = tuple(map(int, lower.split(', ')))
+
+        #go through all the packages returned from database
+        for package in packages_json:
+
+            package_tup = tuple(map(int, package['Version'].split(', ')))
+
+            #if the package matches the query
+            if((package_tup >= lower_tup) and (package['Name'] == name)):
+                
+                #format and return 
+                return_list.append(package)
+
+                counter += 1
+
+                #if there were more than 1000 packages that match, return 413
+                if(counter > 1000):
+                    return "Too many packages matched that query (> 1000)", 413
+                
+    if type == 'tilde':
+
+        upper = version.replace('.', ', ')
+        upper_tup = tuple(map(int, lower.split(', ')))
+        orig_tup = upper_tup
+        upper_tup[1] = str(int(upper_tup[1]) + 1)
+        upper_tup[2] = '0'
+
+        #go through all the packages returned from database
+        for package in packages_json:
+
+            package_tup = tuple(map(int, package['Version'].split(', ')))
+
+            #if the package matches the query
+            if((package_tup >= orig_tup) and (package_tup <= upper_tup) and (package['Name'] == name)):
+                
+                #format and return 
+                return_list.append(package)
+
+                counter += 1
+
+                #if there were more than 1000 packages that match, return 413
+                if(counter > 1000):
+                    return "Too many packages matched that query (> 1000)", 413
+
+
 # POST /packages
 @app.route('/packages', methods = ['POST'])
 def search_packages():
@@ -28,6 +122,7 @@ def search_packages():
     return_list = []
     counter = 0
     
+<<<<<<< Updated upstream
     for search in request_content:
         #request has name and version
         
@@ -64,6 +159,40 @@ def search_packages():
                 if(counter > 1000):
                     return "Too many packages matched that query (> 1000)", 413
 
+=======
+    #request has name and version
+    request_content = flask.request.get_json()
+    print(request_content)
+
+    for item in request_content:
+
+        name = item['Name']
+        version = item['Version']
+
+        #if there was a dash, its a range
+        if '-' in item:
+            #range
+            both_versions = version.split('-')
+            lower = both_versions[0]
+            upper = both_versions[1]
+            return_list += look_for_package(name, [lower, upper], 'range')
+            
+        elif '^' in item:
+            #carrot
+            lower_version = version.replace('^', '')
+            return_list += look_for_package(name, [lower, upper], 'carrot')
+        
+        elif '~' in item:
+            #tilde
+            approx_version = version.replace('~', '')
+            return_list += look_for_package(name, [lower, upper], 'tilde')
+        
+        else:
+            #exact
+            exact_version = version
+            return_list += look_for_package(name, [lower, upper], 'exact')
+    
+>>>>>>> Stashed changes
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
     
