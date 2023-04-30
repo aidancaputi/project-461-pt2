@@ -177,7 +177,7 @@ def main():
 
     print('cloud',cloudinary_ver)
     #post /packages
-    pkgs_json = [{ "Version": f"{cloudinary_ver})","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "1.2.3-2.3.4","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "~1.3.1","Name": "cloudinary" }]
+    pkgs_json = [{ "Version": f"{cloudinary_ver}","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "1.2.3-2.3.4","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "~1.3.1","Name": "cloudinary" }]
     try:
         post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json=pkgs_json)
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')

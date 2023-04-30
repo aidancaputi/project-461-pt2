@@ -138,7 +138,7 @@ def search_packages():
         version = item['Version']
 
         #if there was a dash, its a range
-        if '-' in item:
+        if '-' in version:
             #range
             both_versions = version.split('-')
             lower = both_versions[0]
@@ -149,7 +149,7 @@ def search_packages():
                     return "Too many packages matched that query (> 1000)", 413
             return_list += resp
             
-        elif '^' in item:
+        elif '^' in version:
             #carrot
             lower_version = version.replace('^', '')
             resp = look_for_package(name, lower_version, 'carrot')
@@ -158,7 +158,7 @@ def search_packages():
                     return "Too many packages matched that query (> 1000)", 413
             return_list += resp
         
-        elif '~' in item:
+        elif '~' in version:
             #tilde
             approx_version = version.replace('~', '')
             resp = look_for_package(name, approx_version, 'tilde')
