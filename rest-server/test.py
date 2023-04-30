@@ -6,9 +6,6 @@ import zipfile
 
 def main():
     failed_tests = []
-    #example_body = '{"metadata": {"Name": "string","Version": "1.2.3","ID": "string"},"data": { "Content": "string","URL": "string","JSProgram": "string"}}'
-    #example_body = '{ "Version": "Exact (1.2.3)\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "string" }'
-    #example_json = json.dumps(example_body)
 
     #encode the zip for content
     with open("test_zips/cloudinary_npm-master.zip", "rb") as file1:
@@ -18,21 +15,6 @@ def main():
 
     count = 0
 
-    #put /authenticate
-    #post /package
-    #put /package/id X
-    #get /package/id X
-    #get /package/id/rate
-    #post second /package
-    #post /packages
-    #get /package/byname/name  X
-    #post /package/regex
-    #delete /package/byname/name X
-    #delete /package/id X
-    #post /package
-    #delete /reset
-
-    #put /authenticate
     try:
         put_authenticate_req = {
             "User": {
@@ -273,13 +255,10 @@ def main():
         failed_tests.append('POST PKG URL 2')
         traceback.print_exc()
         print("post /package URL 2 failed with code above")
-    
-    #post regex
-    reg_json = {
-        "RegEx" : "a*"
-    }
 
     try:
+        #post regex
+        reg_json = {"RegEx" : "a*"}
         reg_resp = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/package/byRegEx',json=reg_json)
         print('\nREGEX RESET RESPONSE CODE: ',str(reg_resp.status_code),' ',str(reg_resp.content),'\n')
 
