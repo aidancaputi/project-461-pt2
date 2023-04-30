@@ -204,6 +204,9 @@ def add_package():
         #parse the unzipped repo for the name, version, and url
         package_name, package_version, package_url = parse_for_info(need_url=True)
 
+        if(package_url == None):
+            return "Bad package: unrateable because no URL", 400
+
         #if it didnt find one of the infos, return 400
         if(package_name == None) or (package_version == None):
             clean_up()
