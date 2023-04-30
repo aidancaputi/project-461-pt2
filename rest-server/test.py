@@ -177,7 +177,7 @@ def main():
 
     #post /packages
     try:
-        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json={ "Version": f"Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" })
+        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json=[{ "Version": f"Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" }])
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
         count += 1

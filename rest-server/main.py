@@ -23,45 +23,46 @@ def plain():
 @app.route('/packages', methods = ['POST'])
 def search_packages():
 
+    request_content = flask.request.get_json()
+    print(request_content)
     return_list = []
     counter = 0
     
-    #request has name and version
-    request_content = flask.request.get_json()
-    print(request_content)
-    #print(request_content)
-    name = request_content['Name']
-    version = request_content['Version']
+    for search in request_content:
+        #request has name and version
+        
+        name = search['Name']
+        version = search['Version']
 
-    #get the exact version number
-    versions = version.split('\n')
-    exact_version = versions[0].split('(')[1]
-    exact_version = exact_version.split(')')[0]
+        #get the exact version number
+        versions = version.split('\n')
+        exact_version = versions[0].split('(')[1]
+        exact_version = exact_version.split(')')[0]
 
-    #get json of all packages in database
-    packages_json = json.loads(databaseFunctions.get_all_packages())
-    #print(packages_json)
+        #get json of all packages in database
+        packages_json = json.loads(databaseFunctions.get_all_packages())
+        #print(packages_json)
 
-    #go through the packages and return a match if there is one
+        #go through the packages and return a match if there is one
 
-    print('packages to search through',packages_json)
-    print('version to search for',exact_version)
-    print('name to search for',name)
+        print('packages to search through',packages_json)
+        print('version to search for',exact_version)
+        print('name to search for',name)
 
-    #go through all the packages returned from database
-    for package in packages_json:
+        #go through all the packages returned from database
+        for package in packages_json:
 
-        #if the package matches the query
-        if((package['Version'] == exact_version) and (package['Name'] == name)):
-            
-            #format and return 
-            return_list.append(package)
+            #if the package matches the query
+            if((package['Version'] == exact_version) and (package['Name'] == name)):
+                
+                #format and return 
+                return_list.append(package)
 
-            counter += 1
+                counter += 1
 
-            #if there were more than 1000 packages that match, return 413
-            if(counter > 1000):
-                return "Too many packages matched that query (> 1000)", 413
+                #if there were more than 1000 packages that match, return 413
+                if(counter > 1000):
+                    return "Too many packages matched that query (> 1000)", 413
 
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
