@@ -137,17 +137,17 @@ def search_packages():
         elif '^' in item:
             #carrot
             lower_version = version.replace('^', '')
-            return_list += look_for_package(name, [lower, upper], 'carrot')
+            return_list += look_for_package(name, lower_version, 'carrot')
         
         elif '~' in item:
             #tilde
             approx_version = version.replace('~', '')
-            return_list += look_for_package(name, [lower, upper], 'tilde')
+            return_list += look_for_package(name, approx_version, 'tilde')
         
         else:
             #exact
             exact_version = version
-            return_list += look_for_package(name, [lower, upper], 'exact')
+            return_list += look_for_package(name, exact_version, 'exact')
     
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
