@@ -4,7 +4,6 @@ from datetime import datetime
 import sqlalchemy
 import json
 import os
-import base64
 
 # Python Connector database creator function
 def getconn():
