@@ -122,13 +122,13 @@ def search_packages():
     #request has name and version
     request_content = flask.request.get_json()
     print(request_content)
+    return_list = []
+
 
     for item in request_content:
 
         name = item['Name']
         version = item['Version']
-
-        return_list = []
 
         #if there was a dash, its a range
         if '-' in item:
