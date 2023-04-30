@@ -94,7 +94,7 @@ def look_for_package(name, version, type):
     if type == 'tilde':
 
         upper = version.replace('.', ', ')
-        upper_tup = tuple(map(int, lower.split(', ')))
+        upper_tup = tuple(map(int, upper.split(', ')))
         orig_tup = upper_tup
         upper_tup[1] = str(int(upper_tup[1]) + 1)
         upper_tup[2] = '0'
