@@ -122,7 +122,6 @@ def search_packages():
     return_list = []
     counter = 0
     
-<<<<<<< Updated upstream
     for search in request_content:
         #request has name and version
         
@@ -159,7 +158,7 @@ def search_packages():
                 if(counter > 1000):
                     return "Too many packages matched that query (> 1000)", 413
 
-=======
+
     #request has name and version
     request_content = flask.request.get_json()
     print(request_content)
@@ -192,7 +191,6 @@ def search_packages():
             exact_version = version
             return_list += look_for_package(name, [lower, upper], 'exact')
     
->>>>>>> Stashed changes
     #turn the list of packages into json and return it
     return_json = json.dumps(return_list)
     
