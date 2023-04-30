@@ -296,8 +296,9 @@ def main():
         traceback.print_exc()
         print("delete /reset failed with code above")
 
-    print("passed: " + str(count) + " | failed: " + str(12 - count))
-    print(f'score: {str(count)} / 12 -> {str(round(100*count/12,2))} %')
+    tot = 19
+    print("passed: " + str(count) + " | failed: " + str(tot - count))
+    print(f'score: {str(count)} / {str(tot)} -> {str(round(100*count/tot,2))} %')
     print('Failed tests:')
     for f in failed_tests:
         print(f)

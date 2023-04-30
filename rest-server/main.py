@@ -17,7 +17,7 @@ app = flask.Flask(__name__)
 
 @app.route('/', methods = ['GET'])
 def plain():
-    return 'Project homepage'
+    return 'Welcome to Aidan, Zane, and Josh\'s 461 Project Backend'
 
 def look_for_package(name, version, type):
     counter = 0
