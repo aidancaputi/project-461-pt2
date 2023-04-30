@@ -175,9 +175,11 @@ def main():
         traceback.print_exc()
         print("post /package base64 axios failed with code above")
 
+    print('cloud',cloudinary_ver)
     #post /packages
+    pkgs_json = [{ "Version": f"{cloudinary_ver})","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "1.2.3-2.3.4","Name": "cloudinary" },{ "Version": "^1.2.3","Name": "cloudinary" },{ "Version": "~1.2.3","Name": "cloudinary" }]
     try:
-        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json=[{ "Version": f"Exact ({cloudinary_ver})\nBounded range (1.2.3-2.1.0)\nCarat (^1.2.3)\nTilde (~1.2.0)", "Name": "cloudinary" }])
+        post_pkgs = requests.post('https://rest-server-h5si5ezrea-uc.a.run.app/packages', json=pkgs_json)
         print('\nPOST PKGS RESPONSE CODE: ',str(post_pkgs.status_code),' ',str(post_pkgs.content),'\n')
 
         count += 1
