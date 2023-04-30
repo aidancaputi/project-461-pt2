@@ -126,6 +126,8 @@ def search_packages():
         name = item['Name']
         version = item['Version']
 
+        return_list = []
+
         #if there was a dash, its a range
         if '-' in item:
             #range
