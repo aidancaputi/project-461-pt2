@@ -30,9 +30,11 @@ from database import databaseFunctions
 
 
 def look_for_package(name, version, type):
+    
     counter = 0
     return_list = []
     packages_json = json.loads(databaseFunctions.get_all_packages())
+    print('inside look')
 
     if type == 'exact':
         print('type was exact')
@@ -52,12 +54,13 @@ def look_for_package(name, version, type):
                     return "Too many packages matched that query (> 1000)", 413
                 
     if type == 'range':
-
+        print('type was range')
+        print(version)
         lower = version[0].replace('.', ', ')
         upper = version[1].replace('.', ', ')
         lower_tup = tuple(map(int, lower.split(', ')))
         upper_tup = tuple(map(int, upper.split(', ')))
-        print('type was range')
+       
 
         #go through all the packages returned from database
         for package in packages_json:
@@ -148,11 +151,12 @@ def search_packages(request):
 
         #if there was a dash, its a range
         if '-' in version:
+            
             #range
             both_versions = version.split('-')
-            lower = both_versions[0]
-            upper = both_versions[1]
-            resp = look_for_package(name, [lower, upper], 'range')
+           
+            resp = look_for_package(name,both_versions, 'range')
+            
             if len(resp) == 2:
                 if resp[1] == 413:
                     return "Too many packages matched that query (> 1000)", 413
@@ -166,6 +170,7 @@ def search_packages(request):
                 if resp[1] == 413:
                     return "Too many packages matched that query (> 1000)", 413
             return_list += resp
+            print('ending carrot')
         
         elif '~' in version:
             #tilde
