@@ -101,7 +101,7 @@ def main():
     try:
         get_package_id_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         get_package_id_resp_json = json.loads(get_package_id_resp.content)
-        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',str(len(get_package_id_resp_json['data']['Content'])),get_package_id_resp_json['data']['Content'][:30],'\n')
+        print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',get_package_id_resp_json['metadata'],get_package_id_resp_json['data']['Content'][:30],'\n')
         count += 1
     except:
         failed_tests.append('GET PKG ID')

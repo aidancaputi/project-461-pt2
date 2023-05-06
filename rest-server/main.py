@@ -398,9 +398,8 @@ def get_metrics(package_id):
         print("making request to pt1 server")
         response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
         print("got response from pt1 server: "+ str(response.content),type(response.content))
-        resp_str = str(response.content)[2:]
-        print('resp str',resp_str)
-        resp_real = json.loads(resp_str)
+        
+        resp_real = json.loads(response.content)
         print('resp_real',resp_real,type(resp_real))
         resp_curr = resp_real[0]
         print('resp_curr',resp_curr,type(resp_curr))
@@ -492,7 +491,7 @@ def put_by_id(id):
 def authenticate():
     # authenticate not implemented
     print("authenticate called, returning 501")
-    return "Not Implemented",501
+    return "This system does not support authentication.",501
 
 @app.route("/package/byName/<name>", methods = ['GET','DELETE'])
 def pkgbyName(name):
@@ -502,7 +501,7 @@ def pkgbyName(name):
         resp = databaseFunctions.get_package_history(name)
 
         if resp == 404:
-            return 'no package found',404
+            return 'Package does not exist.',404
         
         return resp
         
@@ -513,9 +512,9 @@ def pkgbyName(name):
         resp = databaseFunctions.delete_history(name)
 
         if resp == 404:
-            return 'no package found',404
+            return 'Package does not exist.',404
         
-        return 'package deleted successfully'
+        return 'Package is deleted.'
 
 @app.route("/package/byRegEx", methods = ['POST'])
 def byRegEx():
@@ -529,7 +528,7 @@ def byRegEx():
         reg = request_content['RegEx']
         print(reg)
     except:
-        return return_json,400
+        return 'There is missing field(s) in the PackageRegEx/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.',400
     
     all_pkgs = json.loads(databaseFunctions.get_all_packages())
     
@@ -543,8 +542,11 @@ def byRegEx():
     
     print('matched packages',match_pkgs)
 
+    if len(match_pkgs) == 0:
+        return 'No package found under this regex.',404
+
     return_json = flask.jsonify(match_pkgs)
-    return_json.headers.add('Access-Control-Allow-Origin','*')
+    print(return_json,type(return_json))
 
     return return_json
 
