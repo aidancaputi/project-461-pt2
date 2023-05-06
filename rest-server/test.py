@@ -98,10 +98,25 @@ def main():
         print("put /package/id failed with code above")
 
     #get /package/id
+    def convert_base64_and_unzip(encoded):
+
+        print("decoding base64")
+
+        #open a zip and write the decoded file to it
+        with open('output_file.zip', 'wb') as result:
+            result.write(base64.b64decode(encoded))
+
+        #extract that file into folder with the name "cloned_repo"
+        zip_ref = zipfile.ZipFile("output_file.zip", 'r')
+        zip_ref.extractall("cloned_repo6969") 
+        zip_ref.close()
+
+        print("base64 decoded into directory")
     try:
         get_package_id_resp = requests.get(f'https://rest-server-h5si5ezrea-uc.a.run.app/package/{cloudinary_id}')
         get_package_id_resp_json = json.loads(get_package_id_resp.content)
         print('\nGET PKG ID RESPONSE CODE: ',str(get_package_id_resp.status_code),' ',get_package_id_resp_json['metadata'],get_package_id_resp_json['data']['Content'][:30],'\n')
+        #convert_base64_and_unzip(get_package_id_resp_json['data']['Content'])
         count += 1
     except:
         failed_tests.append('GET PKG ID')
