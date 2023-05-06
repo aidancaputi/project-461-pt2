@@ -389,7 +389,7 @@ def get_metrics(package_id):
     db_resp = databaseFunctions.get_package(package_id)
 
     if db_resp == 404:
-        return 'Package does not exist',404
+        return 'Package does not exist.',404
     else:
         #get url from content
         url = db_resp['data']['URL']
@@ -397,9 +397,15 @@ def get_metrics(package_id):
         #use the URL to make request to pt1 server
         print("making request to pt1 server")
         response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
-        print("got response from pt1 server: "+ str(response.content))
+        print("got response from pt1 server: "+ str(response.content),type(response.content))
+        resp_str = str(response.content)[2:]
+        print('resp str',resp_str)
+        resp_real = json.loads(resp_str)
+        print('resp_real',resp_real,type(resp_real))
+        resp_curr = resp_real[0]
+        print('resp_curr',resp_curr,type(resp_curr))
 
-        return response.content[0]
+        return resp_curr,200
 
 
 # /reset
