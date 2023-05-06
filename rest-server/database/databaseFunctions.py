@@ -315,6 +315,8 @@ def chopString(data):
     else:
         content_str =  str(data)
     
+    content_str = content_str[2:]
+
     return content_str
     
 # create a new bucket for content storage

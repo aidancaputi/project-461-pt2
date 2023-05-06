@@ -313,13 +313,13 @@ def add_package():
         package_name, package_version, package_url = parse_for_info(need_url=True)
 
         if(package_url == None):
-            return "Bad package: unrateable because no URL", 400
+            return "There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.", 400
 
         #if it didnt find one of the infos, return 400
         if(package_name == None) or (package_version == None):
             clean_up()
             print("didnt find a necessary info on the repo, returning 400")
-            return '{}', 400
+            return 'There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.', 400
                 
         #upload to database
         database_confirmation = databaseFunctions.upload_package(package_name, package_version, content, package_url, request_content['JSProgram'])
@@ -328,7 +328,7 @@ def add_package():
         if(database_confirmation == 409):
             clean_up()
             print("package already existed, returning 409")
-            return "Package already exists", 409
+            return "Package exists already.", 409
 
         clean_up()
 
@@ -348,7 +348,7 @@ def add_package():
         if(package_name == None) or (package_version == None):
             clean_up()
             print("didnt find a necessary info on the repo, returning 400")
-            return '{}', 400
+            return 'There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.', 400
 
         #encode the cloned repo
         encoding = encode_repo("cloned_repo")
@@ -360,7 +360,7 @@ def add_package():
         if(database_confirmation == 409):
             clean_up()
             print("package already existed, returning 409")
-            return "Package already exists", 409
+            return "Package exists already.", 409
         
         #print(package_name, package_version, package_url, request_content['JSProgram'])
 
@@ -370,14 +370,14 @@ def add_package():
 
         print("both or neither content/url were set, bad request 400")
         #this would be if both or neither field were set
-        return "Bad request", 400
+        return "There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.", 400
 
     return_json = flask.jsonify(database_confirmation)
     return_json.headers.add('Transfer-Encoding','chunked') 
 
     print("post /package success")
 
-    return return_json
+    return return_json,201
 
 # GET /package/{id}/rate
 @app.route("/package/<package_id>/rate", methods = ["GET"])
@@ -389,7 +389,7 @@ def get_metrics(package_id):
     db_resp = databaseFunctions.get_package(package_id)
 
     if db_resp == 404:
-        return 'package not found',404
+        return 'Package does not exist',404
     else:
         #get url from content
         url = db_resp['data']['URL']
@@ -399,7 +399,7 @@ def get_metrics(package_id):
         response = requests.get('https://pt1-server-h5si5ezrea-uc.a.run.app' + '/' + url)
         print("got response from pt1 server: "+ str(response.content))
 
-        return response.content
+        return response.content[0]
 
 
 # /reset
@@ -434,7 +434,7 @@ def put_by_id(id):
             put_JSProgram = request_content['data']['JSProgram']
         except:
             print("error reading fields from request")
-            return "Missing fields", 400
+            return 'There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.', 400
 
         # if no URL, find it from content
         if put_URL == None:
@@ -454,9 +454,9 @@ def put_by_id(id):
         print("update_package returned")
 
         if(db_resp == 200):
-            return "OK", 200
+            return 'Version is updated.', 200
 
-        return "Package does not exist", 404
+        return 'Package does not exist.', 404
     
     elif flask.request.method == 'GET':
         # send query to get <id> in variable id
@@ -464,7 +464,7 @@ def put_by_id(id):
 
         #if the package wasnt in the database, return 404
         if(db_resp == 404):
-            return "No package with that ID exists", 404
+            return "Package does not exist.", 404
         
         return_json = flask.jsonify(db_resp)
         return_json.headers.add('Transfer-Encoding','chunked') 
@@ -477,9 +477,9 @@ def put_by_id(id):
         db_resp = databaseFunctions.delete_package(id)
 
         if(db_resp == 404):
-            return "No package with that ID exists", 404
+            return "Package does not exist.", 404
         
-        return "Package deleted successfully", 200
+        return "Package is deleted.", 200
 
 @app.route("/authenticate", methods = ['PUT'])
 
