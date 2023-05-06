@@ -372,7 +372,7 @@ def add_package():
         #this would be if both or neither field were set
         return "There is missing field(s) in the PackageData/AuthenticationToken or it is formed improperly (e.g. Content and URL are both set), or the AuthenticationToken is invalid.", 400
 
-    return_json = flask.jsonify(database_confirmation)
+    return_json = json.loads(database_confirmation)
     return_json.headers.add('Transfer-Encoding','chunked') 
 
     print("post /package success")
@@ -413,8 +413,7 @@ def reset():
     print("delete /reset enter")
     databaseFunctions.reset_database()
     print("database reset success")
-    response = flask.jsonify(success=True)
-    return response, 200
+    return 'Registry is reset.', 200
 
 # PUT /package/{id}
 @app.route("/package/<id>", methods = ['PUT','GET','DELETE'])
@@ -471,7 +470,7 @@ def put_by_id(id):
         if(db_resp == 404):
             return "Package does not exist.", 404
         
-        return_json = flask.jsonify(db_resp)
+        return_json = json.loads(db_resp)
         return_json.headers.add('Transfer-Encoding','chunked') 
 
         return return_json
@@ -519,7 +518,7 @@ def pkgbyName(name):
 @app.route("/package/byRegEx", methods = ['POST'])
 def byRegEx():
     match_pkgs = []
-    return_json = flask.jsonify(match_pkgs)
+    return_json = json.loads(match_pkgs)
     return_json.headers.add('Access-Control-Allow-Origin','*')
 
     request_content = flask.request.get_json()
@@ -545,7 +544,7 @@ def byRegEx():
     if len(match_pkgs) == 0:
         return 'No package found under this regex.',404
 
-    return_json = flask.jsonify(match_pkgs)
+    return_json = json.loads(match_pkgs)
     print(return_json,type(return_json))
 
     return return_json
